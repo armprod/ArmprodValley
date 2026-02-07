@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bea2caoccgeip"]
 
-[ext_resource type="Script" uid="uid://bojtr5fekrr2o" path="res://Player.cs" id="1_4flbx"]
+[ext_resource type="Script" uid="uid://bojtr5fekrr2o" path="res://scripts/Player.cs" id="1_4flbx"]
 [ext_resource type="Texture2D" uid="uid://5wipkiub31sk" path="res://assets/character.png" id="2_onrkg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
@@ -95,6 +95,8 @@ _data = {
 }
 
 [node name="Player" type="CharacterBody2D" unique_id=1670660227]
+collision_layer = 0
+collision_mask = 3
 script = ExtResource("1_4flbx")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=692551886]
