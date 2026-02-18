@@ -1,0 +1,83 @@
+[gd_scene format=3 uid="uid://cjtys1bjgh2yo"]
+
+[ext_resource type="Script" uid="uid://dsn4fbcnhldk6" path="res://scripts/FishBar.cs" id="1_aebqi"]
+[ext_resource type="Texture2D" uid="uid://crshsgkam8s6o" path="res://assets/fishing_assets.png" id="1_b0fop"]
+[ext_resource type="Script" uid="uid://bsqw56clnyitr" path="res://scripts/inside_bar.cs" id="2_jirww"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jirww"]
+size = Vector2(2, 46)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_aebqi"]
+size = Vector2(4, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ugnom"]
+size = Vector2(2, 2)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jirww"]
+atlas = ExtResource("1_b0fop")
+region = Rect2(54, 0, 4, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_aebqi"]
+atlas = ExtResource("1_b0fop")
+region = Rect2(39.12, 1, 2, 46)
+
+[node name="FishingBar" type="Node2D" unique_id=1152634330]
+position = Vector2(300, 300)
+script = ExtResource("1_aebqi")
+
+[node name="outside" type="Sprite2D" parent="." unique_id=772451753]
+texture = ExtResource("1_b0fop")
+region_enabled = true
+region_rect = Rect2(22, 0, 4, 48)
+
+[node name="GrooveJoint2D" type="GrooveJoint2D" parent="outside" unique_id=671636282]
+position = Vector2(0, -20.24)
+node_a = NodePath("../StaticBody2D")
+node_b = NodePath("../RigidBody2D")
+length = 45.0
+
+[node name="StaticBody2D" type="StaticBody2D" parent="outside" unique_id=1140172445]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="outside/StaticBody2D" unique_id=113989040]
+shape = SubResource("RectangleShape2D_jirww")
+disabled = true
+
+[node name="RigidBody2D" type="RigidBody2D" parent="outside" unique_id=2145184131]
+script = ExtResource("2_jirww")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="outside/RigidBody2D" unique_id=971201210]
+shape = SubResource("RectangleShape2D_aebqi")
+
+[node name="inside" type="Sprite2D" parent="outside/RigidBody2D" unique_id=1773113556]
+texture = ExtResource("1_b0fop")
+region_enabled = true
+region_rect = Rect2(6, 3, 4, 10)
+
+[node name="fish" type="Sprite2D" parent="." unique_id=572695528]
+texture = ExtResource("1_b0fop")
+region_enabled = true
+region_rect = Rect2(7, 23, 2, 2)
+
+[node name="Area2D" type="Area2D" parent="fish" unique_id=1044778725]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="fish/Area2D" unique_id=517583142]
+shape = SubResource("RectangleShape2D_ugnom")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=2133472984]
+zoom = Vector2(10, 10)
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="." unique_id=1652273168]
+offset_left = 1.9999878
+offset_top = -24.0
+offset_right = 5.9999876
+offset_bottom = 24.0
+step = 0.0
+fill_mode = 3
+stretch_margin_left = 2
+texture_under = SubResource("AtlasTexture_jirww")
+texture_progress = SubResource("AtlasTexture_aebqi")
+texture_progress_offset = Vector2(1, 1)
+
+[node name="Timer" type="Timer" parent="." unique_id=1434897508]
+wait_time = 0.2
+autostart = true
