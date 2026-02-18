@@ -3,16 +3,24 @@ using System;
 
 public partial class Player : CharacterBody2D
 {
+	// ***** FISHING *****
+	// Stavy pro přehlednost
+	public enum FishingState { None, HoldingRod, Casting, WaitingForBite }
+	public FishingState CurrentFishingState = FishingState.None;
+
+	[Export] public bool HasFishingRod = true; // Pro testování nastaveno na true
 	[Export] public float Speed = 100.0f;
 
 	private AnimationPlayer _animPlayer;
 	private Sprite2D _sprite;
-
+	
+	
 	public override void _Ready()
 	{
 		// Najdeme AnimationPlayer a Sprite2D při startu
 		_animPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 		_sprite = GetNode<Sprite2D>("Sprite2D");
+		
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -59,5 +67,47 @@ public partial class Player : CharacterBody2D
 			else
 				_animPlayer.Play("walk_up");
 		}
+	}
+
+	public override void _Input(InputEvent @event)
+{
+	// 1. Zmáčknutí klávesy '1'
+	if (@event.IsActionPressed("slot_one"))
+	{
+		// Název animace musí být v uvozovkách!
+		_animPlayer.Play("equip_rod"); 
+	}
+
+	// 2. Levé tlačítko myši - Nahození (pouze pokud držím prut)
+	if (@event.IsActionPressed("left_click") && CurrentFishingState == FishingState.HoldingRod)
+	{
+		StartCasting();
+	}
+}
+
+	private void ToggleFishingRod()
+	{
+		if (CurrentFishingState == FishingState.None)
+		{
+			CurrentFishingState = FishingState.HoldingRod;
+			_animPlayer.Play("RESET"); // Animace, kde hráč vytáhne prut
+			GD.Print("Prut připraven v ruce.");
+		}
+		else if (CurrentFishingState == FishingState.HoldingRod)
+		{
+			CurrentFishingState = FishingState.None;
+			_animPlayer.Play("Idle"); // Schová prut
+			GD.Print("Prut schován.");
+		}
+	}
+
+	private void StartCasting()
+	{
+		CurrentFishingState = FishingState.Casting;
+		_animPlayer.Play("CastRod"); // Tvoje animace nahození
+		GD.Print("Nahazuji...");
+
+		// Po skončení animace nahození se přepneme do čekání
+		// To můžeš vyřešit signálem AnimationFinished jako minule
 	}
 }

@@ -21,6 +21,22 @@ tracks/0/keys = {
 "values": [0]
 }
 
+[sub_resource type="Animation" id="Animation_g2els"]
+resource_name = "equip_rod"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [40]
+}
+
 [sub_resource type="Animation" id="Animation_hqtel"]
 resource_name = "walk_down"
 loop_mode = 1
@@ -88,6 +104,7 @@ tracks/0/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_sweqy"]
 _data = {
 &"RESET": SubResource("Animation_i3pqv"),
+&"equip_rod": SubResource("Animation_g2els"),
 &"walk_down": SubResource("Animation_hqtel"),
 &"walk_left": SubResource("Animation_onrkg"),
 &"walk_right": SubResource("Animation_sweqy"),

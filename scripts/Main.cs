@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public partial class WorldManager : Node2D
+public partial class Main : Node2D
 {
 	[Export] public TileMapLayer FarmLayer; // Přetáhni svůj TileMapLayer do inspektoru
 
