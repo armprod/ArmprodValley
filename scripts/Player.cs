@@ -3,45 +3,34 @@ using System;
 
 public partial class Player : CharacterBody2D
 {
-	// ***** FISHING *****
-	// Stavy pro přehlednost
 	public enum FishingState { None, HoldingRod, Casting, WaitingForBite }
 	public FishingState CurrentFishingState = FishingState.None;
 
-	[Export] public bool HasFishingRod = true; // Pro testování nastaveno na true
 	[Export] public float Speed = 100.0f;
 
 	private AnimationPlayer _animPlayer;
-	private Sprite2D _sprite;
-	
-	
+	private Vector2 _lastDirection = Vector2.Down; // Výchozí pohled dolů
+
 	public override void _Ready()
 	{
-		// Najdeme AnimationPlayer a Sprite2D při startu
 		_animPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-		_sprite = GetNode<Sprite2D>("Sprite2D");
-		
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
-		// 1. Získání směru pohybu (W, S, A, D nebo šipky)
-		Vector2 velocity = Velocity;
 		Vector2 direction = Input.GetVector("left", "right", "up", "down");
+		Vector2 velocity = Velocity;
 
 		if (direction != Vector2.Zero)
 		{
+			_lastDirection = direction; // Uložíme si, kam hráč naposledy šel
 			velocity = direction * Speed;
-			
-			// 2. Spuštění správné animace podle směru
 			UpdateAnimation(direction);
 		}
 		else
 		{
 			velocity = velocity.MoveToward(Vector2.Zero, Speed);
-			
-			// 3. Pokud hráč stojí, animaci zastavíme (nebo přepneme na Idle)
-			_animPlayer.Stop(); 
+			PlayIdleAnimation(); // Když stojí, pustíme Idle (s prutem nebo bez)
 		}
 
 		Velocity = velocity;
@@ -50,64 +39,80 @@ public partial class Player : CharacterBody2D
 
 	private void UpdateAnimation(Vector2 dir)
 	{
-		// Logika výběru animace
+		string suffix = (CurrentFishingState == FishingState.HoldingRod) ? "_rod" : "";
+		
 		if (Mathf.Abs(dir.X) > Mathf.Abs(dir.Y))
 		{
-			// Horizontální pohyb (Doleva/Doprava)
-			if (dir.X > 0)
-				_animPlayer.Play("walk_right");
-			else
-				_animPlayer.Play("walk_left");
+			if (dir.X > 0) _animPlayer.Play("walk_right" + suffix);
+			else _animPlayer.Play("walk_left" + suffix);
 		}
 		else
 		{
-			// Vertikální pohyb (Nahoru/Dolů)
-			if (dir.Y > 0)
-				_animPlayer.Play("walk_down");
-			else
-				_animPlayer.Play("walk_up");
+			if (dir.Y > 0) _animPlayer.Play("walk_down" + suffix);
+			else _animPlayer.Play("walk_up" + suffix);
+		}
+	}
+
+	private void PlayIdleAnimation()
+	{
+		string suffix = (CurrentFishingState == FishingState.HoldingRod) ? "_rod" : "";
+		
+		// Vybere Idle animaci podle toho, kam se hráč naposledy díval
+		if (Mathf.Abs(_lastDirection.X) > Mathf.Abs(_lastDirection.Y))
+		{
+			if (_lastDirection.X > 0) _animPlayer.Play("idle_right" + suffix);
+			else _animPlayer.Play("idle_left" + suffix);
+		}
+		else
+		{
+			if (_lastDirection.Y > 0) _animPlayer.Play("idle_down" + suffix);
+			else _animPlayer.Play("idle_up" + suffix);
 		}
 	}
 
 	public override void _Input(InputEvent @event)
-{
-	// 1. Zmáčknutí klávesy '1'
-	if (@event.IsActionPressed("slot_one"))
 	{
-		// Název animace musí být v uvozovkách!
-		_animPlayer.Play("equip_rod"); 
-	}
+		// Přepínání prutu klávesou 1
+		if (@event.IsActionPressed("slot_one"))
+		{
+			ToggleFishingRod();
+		}
 
-	// 2. Levé tlačítko myši - Nahození (pouze pokud držím prut)
-	if (@event.IsActionPressed("left_click") && CurrentFishingState == FishingState.HoldingRod)
-	{
-		StartCasting();
+		// Nahození
+		if (@event.IsActionPressed("left_click") && CurrentFishingState == FishingState.HoldingRod)
+		{
+			StartCasting();
+		}
 	}
-}
 
 	private void ToggleFishingRod()
 	{
 		if (CurrentFishingState == FishingState.None)
 		{
 			CurrentFishingState = FishingState.HoldingRod;
-			_animPlayer.Play("RESET"); // Animace, kde hráč vytáhne prut
-			GD.Print("Prut připraven v ruce.");
+			GD.Print("Prut vytažen");
 		}
-		else if (CurrentFishingState == FishingState.HoldingRod)
+		else
 		{
 			CurrentFishingState = FishingState.None;
-			_animPlayer.Play("Idle"); // Schová prut
-			GD.Print("Prut schován.");
+			GD.Print("Prut schován");
 		}
+		// Okamžitě aktualizujeme animaci postavy, aby se vizuálně změnil postoj
+		PlayIdleAnimation();
 	}
 
 	private void StartCasting()
 	{
 		CurrentFishingState = FishingState.Casting;
-		_animPlayer.Play("CastRod"); // Tvoje animace nahození
-		GD.Print("Nahazuji...");
+		
+		// Určíme, na jakou stranu nahodit
+		string dirName = "down";
+		if (Mathf.Abs(_lastDirection.X) > Mathf.Abs(_lastDirection.Y))
+			dirName = _lastDirection.X > 0 ? "right" : "left";
+		else
+			dirName = _lastDirection.Y > 0 ? "down" : "up";
 
-		// Po skončení animace nahození se přepneme do čekání
-		// To můžeš vyřešit signálem AnimationFinished jako minule
+		_animPlayer.Play("cast_" + dirName);
+		GD.Print("Nahazuji na stranu: " + dirName);
 	}
 }
