@@ -419,11 +419,13 @@ physics_layer_0/collision_layer = 2
 physics_layer_0/collision_mask = 0
 sources/0 = SubResource("TileSetAtlasSource_fos0i")
 
-[node name="Main" type="Node2D" unique_id=633975537]
+[node name="Main" type="Node2D" unique_id=633975537 node_paths=PackedStringArray("FarmLayer")]
 script = ExtResource("1_vcsgt")
+FarmLayer = NodePath("Ground")
 
-[node name="Player" parent="." unique_id=1670660227 instance=ExtResource("2_c01mt")]
+[node name="Player" parent="." unique_id=1670660227 node_paths=PackedStringArray("WaterLayer") instance=ExtResource("2_c01mt")]
 z_index = 2
+WaterLayer = NodePath("../Water")
 
 [node name="Hazards" type="TileMapLayer" parent="." unique_id=1653340301]
 z_index = 2
