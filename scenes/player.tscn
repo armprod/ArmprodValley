@@ -1631,42 +1631,6 @@ _data = {
 &"walk_up_rod": SubResource("Animation_ur7pv")
 }
 
-[sub_resource type="Animation" id="Animation_a38lo"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("FishingBar:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(100, 3)]
-}
-
-[sub_resource type="Animation" id="Animation_4ni07"]
-resource_name = "fishing_bar"
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("FishingBar:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(100, 3), Vector2(0, 3)]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_l71n6"]
-_data = {
-&"RESET": SubResource("Animation_a38lo"),
-&"fishing_bar": SubResource("Animation_4ni07")
-}
-
 [node name="Player" type="CharacterBody2D" unique_id=1670660227]
 collision_layer = 0
 collision_mask = 3
@@ -1690,17 +1654,3 @@ libraries/ = SubResource("AnimationLibrary_sweqy")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=2084284203]
 zoom = Vector2(2.5, 2.5)
-
-[node name="CanvasLayer" type="Control" parent="." unique_id=218122623]
-layout_mode = 3
-anchors_preset = 0
-offset_left = 300.0
-offset_right = 300.0
-scale = Vector2(3, 3)
-
-[node name="FishingBar" parent="CanvasLayer" unique_id=1152634330 instance=ExtResource("5_qlg0r")]
-z_index = 10
-position = Vector2(100, 3)
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="CanvasLayer" unique_id=993695359]
-libraries/ = SubResource("AnimationLibrary_l71n6")

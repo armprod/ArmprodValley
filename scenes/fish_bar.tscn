@@ -22,53 +22,103 @@ region = Rect2(54, 0, 4, 48)
 atlas = ExtResource("1_b0fop")
 region = Rect2(39.12, 1, 2, 46)
 
-[node name="FishingBar" type="Node2D" unique_id=1152634330]
-position = Vector2(300, 300)
+[sub_resource type="Animation" id="Animation_ugnom"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MainContainer:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(400, 100)]
+}
+
+[sub_resource type="Animation" id="Animation_g6bds"]
+resource_name = "fishing_bar_appear"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MainContainer:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(400, 100), Vector2(360, 100)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_pd1bo"]
+_data = {
+&"RESET": SubResource("Animation_ugnom"),
+&"fishing_bar_appear": SubResource("Animation_g6bds")
+}
+
+[node name="FishingBar" type="CanvasLayer" unique_id=981942327]
+scale = Vector2(5, 5)
+transform = Transform2D(5, 0, 0, 5, 0, 0)
 script = ExtResource("1_aebqi")
 
-[node name="outside" type="Sprite2D" parent="." unique_id=772451753]
+[node name="MainContainer" type="Control" parent="." unique_id=2038244551]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -560.0
+offset_top = -440.0
+offset_right = -560.0
+offset_bottom = -440.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="outside" type="Sprite2D" parent="MainContainer" unique_id=772451753]
 texture = ExtResource("1_b0fop")
 region_enabled = true
 region_rect = Rect2(22, 0, 4, 48)
 
-[node name="GrooveJoint2D" type="GrooveJoint2D" parent="outside" unique_id=671636282]
+[node name="GrooveJoint2D" type="GrooveJoint2D" parent="MainContainer/outside" unique_id=671636282]
 position = Vector2(0, -20.24)
 node_a = NodePath("../StaticBody2D")
 node_b = NodePath("../RigidBody2D")
 length = 45.0
 
-[node name="StaticBody2D" type="StaticBody2D" parent="outside" unique_id=1140172445]
+[node name="StaticBody2D" type="StaticBody2D" parent="MainContainer/outside" unique_id=1140172445]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="outside/StaticBody2D" unique_id=113989040]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MainContainer/outside/StaticBody2D" unique_id=113989040]
 shape = SubResource("RectangleShape2D_jirww")
 disabled = true
 
-[node name="RigidBody2D" type="RigidBody2D" parent="outside" unique_id=2145184131]
+[node name="RigidBody2D" type="RigidBody2D" parent="MainContainer/outside" unique_id=2145184131]
+lock_rotation = true
 script = ExtResource("2_jirww")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="outside/RigidBody2D" unique_id=971201210]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MainContainer/outside/RigidBody2D" unique_id=971201210]
 shape = SubResource("RectangleShape2D_aebqi")
 
-[node name="inside" type="Sprite2D" parent="outside/RigidBody2D" unique_id=1773113556]
+[node name="inside" type="Sprite2D" parent="MainContainer/outside/RigidBody2D" unique_id=1773113556]
 texture = ExtResource("1_b0fop")
 region_enabled = true
 region_rect = Rect2(6, 3, 4, 10)
 
-[node name="fish" type="Sprite2D" parent="." unique_id=572695528]
+[node name="fish" type="Sprite2D" parent="MainContainer" unique_id=572695528]
 texture = ExtResource("1_b0fop")
 region_enabled = true
 region_rect = Rect2(7, 23, 2, 2)
 script = ExtResource("4_ugnom")
 
-[node name="Area2D" type="Area2D" parent="fish" unique_id=1044778725]
+[node name="Area2D" type="Area2D" parent="MainContainer/fish" unique_id=1044778725]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="fish/Area2D" unique_id=517583142]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MainContainer/fish/Area2D" unique_id=517583142]
 shape = SubResource("RectangleShape2D_ugnom")
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=2133472984]
-zoom = Vector2(10, 10)
-
-[node name="TextureProgressBar" type="TextureProgressBar" parent="." unique_id=1652273168]
+[node name="TextureProgressBar" type="TextureProgressBar" parent="MainContainer" unique_id=1652273168]
+layout_mode = 0
 offset_left = 1.9999878
 offset_top = -24.0
 offset_right = 5.9999876
@@ -80,6 +130,10 @@ texture_under = SubResource("AtlasTexture_jirww")
 texture_progress = SubResource("AtlasTexture_aebqi")
 texture_progress_offset = Vector2(1, 1)
 
-[node name="Timer" type="Timer" parent="." unique_id=1434897508]
+[node name="Timer" type="Timer" parent="MainContainer" unique_id=1434897508]
 wait_time = 0.2
 autostart = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1263345414]
+libraries/ = SubResource("AnimationLibrary_pd1bo")
+autoplay = &"fishing_bar_appear"

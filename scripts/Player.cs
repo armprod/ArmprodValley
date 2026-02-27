@@ -94,7 +94,7 @@ public partial class Player : CharacterBody2D
 		if (@event.IsActionPressed("slot_one")) ToggleFishingRod();
 
 		if (@event.IsActionPressed("left_click"))
-		{
+		{	
 			HandleActionInput();
 		}
 	}
