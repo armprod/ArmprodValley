@@ -19,7 +19,8 @@ public partial class Player : CharacterBody2D
 	private Vector2 _lastDirection = Vector2.Down;
 	private Timer _fishingTimer;   // Časovač na čekání na rybu
 	private Timer _reactionTimer;  // Časovač na to, jak dlouho ryba kouše
-
+	public bool IsFishing = false;
+	
 	public override void _Ready()
 	{
 		_animPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
@@ -40,6 +41,7 @@ public partial class Player : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (IsFishing) return; // Pokud rybaří, skript hráče do animací nekecá
 		// STOPKA: Pokud se rybaří, hráč se nehýbe
 		if (CurrentFishingState != FishingState.None && CurrentFishingState != FishingState.HoldingRod)
 		{
