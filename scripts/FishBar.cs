@@ -92,19 +92,47 @@ public partial class FishBar : CanvasLayer
 		return dir.Y > 0 ? "down" : "up";
 	}
 
-	private void WinGame()
+	private async void WinGame()
 	{       
+		if (_isFinished) return;
 		_isFinished = true;
 		CaughtFishCount++;
-		GD.Print("Ryba uložena! Celkem: " + CaughtFishCount);
 
-		string directionName = GetDirectionName(_playerArea.LinearVelocity);
-		string finalAnim = $"fish_catched_up_{directionName}";
+		// 1. Zjistíme, jakým směrem hráč právě nahazuje (předpokládáme animace cast_left, cast_right...)
+		string finalDirection = "down"; // Výchozí
 
+		if (_animPlayer != null)
+	{
+		// AssignedAnimation si pamatuje název, i když animace už dohrála do konce
+		string currentAnim = _animPlayer.AssignedAnimation; 
+
+		GD.Print("Aktuálně detekovaná animace v Playerovi: " + currentAnim);
+
+		if (currentAnim.Contains("right")) finalDirection = "right";
+		else if (currentAnim.Contains("left")) finalDirection = "left";
+		else if (currentAnim.Contains("down")) finalDirection = "down";
+		else if (currentAnim.Contains("up")) finalDirection = "up";
+	}
+
+		// 2. Sestavíme název animace pro chycení (např. "fish_catched_left")
+		// Tady si dej pozor na to "c" v catched/cathed, musí to být stejné jako v AnimationPlayeru
+		string finalAnim = $"fish_catched_{finalDirection}";
+
+		// 3. Pustíme vítěznou animaci na HRÁČI
 		if (_animPlayer != null && _animPlayer.HasAnimation(finalAnim))
 		{
 			_animPlayer.Play(finalAnim);
-			GD.Print("Vítězná pozice na hráči: " + finalAnim);
+			GD.Print($"Z nahození {_animPlayer.CurrentAnimation} přecházíme na {finalAnim}");
 		}
+		else
+		{
+			GD.PrintErr($"CHYBA: Animace {finalAnim} nebyla v Playerovi nalezena!");
+		}
+
+		// 4. Krátká pauza, aby scéna nezmizela v milisekundě
+		await ToSignal(GetTree().CreateTimer(0.8f), "timeout");
+
+		// 5. SMAŽEME RYBÁŘSKÝ BAR
+		this.QueueFree();
 	}
 }
