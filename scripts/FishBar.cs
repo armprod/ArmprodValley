@@ -70,7 +70,14 @@ public partial class FishBar : CanvasLayer
 		_progressBar.Value += (isFishInside ? FillSpeed : -DrainSpeed) * (float)delta;
 		_progressBar.Value = Mathf.Clamp(_progressBar.Value, 0, 100);
 
-		if (_progressBar.Value >= 100) WinGame();
+		if (_progressBar.Value >= 100)
+		{
+			WinGame();
+		}
+		else if (_progressBar.Value <= 0)
+		{
+			LoseGame();
+		}
 		
 		if (_animPlayer != null && _animPlayer.HasAnimation(animName))
 		{
@@ -133,6 +140,35 @@ public partial class FishBar : CanvasLayer
 		await ToSignal(GetTree().CreateTimer(0.8f), "timeout");
 
 		// 5. SMAŽEME RYBÁŘSKÝ BAR
+		this.QueueFree();
+	}
+	
+	private async void LoseGame()
+	{
+		if (_isFinished) return;
+		_isFinished = true;
+
+		GD.Print("Ryba utekla!");
+
+		if (_animPlayer != null)
+		{
+			string currentAnim = _animPlayer.AssignedAnimation;
+			string direction = "up";
+			if (currentAnim.Contains("right")) direction = "right";
+			else if (currentAnim.Contains("left")) direction = "left";
+			else if (currentAnim.Contains("down")) direction = "down";
+			
+			string failAnim = $"idle_{direction}"; 
+			_animPlayer.Play(failAnim);
+		}
+
+		await ToSignal(GetTree().CreateTimer(0.5f), "timeout");
+
+		if (_player != null)
+		{
+			_player.Set("IsFishing", false);
+		}
+
 		this.QueueFree();
 	}
 }
