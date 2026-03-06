@@ -109,17 +109,17 @@ public partial class FishBar : CanvasLayer
 		string finalDirection = "down"; // Výchozí
 
 		if (_animPlayer != null)
-	{
-		// AssignedAnimation si pamatuje název, i když animace už dohrála do konce
-		string currentAnim = _animPlayer.AssignedAnimation; 
+		{
+			// AssignedAnimation si pamatuje název, i když animace už dohrála do konce
+			string currentAnim = _animPlayer.AssignedAnimation; 
 
-		GD.Print("Aktuálně detekovaná animace v Playerovi: " + currentAnim);
+			GD.Print("Aktuálně detekovaná animace v Playerovi: " + currentAnim);
 
-		if (currentAnim.Contains("right")) finalDirection = "right";
-		else if (currentAnim.Contains("left")) finalDirection = "left";
-		else if (currentAnim.Contains("down")) finalDirection = "down";
-		else if (currentAnim.Contains("up")) finalDirection = "up";
-	}
+			if (currentAnim.Contains("right")) finalDirection = "right";
+			else if (currentAnim.Contains("left")) finalDirection = "left";
+			else if (currentAnim.Contains("down")) finalDirection = "down";
+			else if (currentAnim.Contains("up")) finalDirection = "up";
+		}
 
 		// 2. Sestavíme název animace pro chycení (např. "fish_catched_left")
 		// Tady si dej pozor na to "c" v catched/cathed, musí to být stejné jako v AnimationPlayeru
