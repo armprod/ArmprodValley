@@ -39,44 +39,51 @@ public partial class FishBar : CanvasLayer
 		_cursorArea = GetNodeOrNull<Area2D>("MainContainer/fish/Area2D"); 
 		_playerArea = GetNodeOrNull<RigidBody2D>("MainContainer/outside/GreenCursor");
 
-		if (_progressBar != null) _progressBar.Value = 0;
+		if (_progressBar != null) _progressBar.Value = 25.0f;
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
 		if (_isFinished || _progressBar == null || _cursorArea == null || _playerArea == null) return;
 
-		// 1. Získáme směr pohybu KURZORU (pro animaci nahoru/dolů)
-		Vector2 playerDir = _playerArea.LinearVelocity;
-		string directionName = GetDirectionName(playerDir);
-
-		// 2. Určíme stav (up/down)
+		// 1. Zjistíme, zda je ryba uvnitř
 		bool isFishInside = _cursorArea.OverlapsBody(_playerArea);
-		string state = isFishInside ? "up" : "down";
 
-		// 3. Sestavíme název animace
-		string animName = $"fish_catched_{state}_{directionName}";
+		// 2. VÝPOČET ZMĚNY - Tady musíme zajistit, aby se hodnota skutečně měnila
+		float speed = isFishInside ? FillSpeed : -DrainSpeed;
+		double change = speed * delta;
 
-		// 4. PUSTÍME ANIMACI NA HRÁČI (používáme tu proměnnou _animPlayer z Ready)
-		if (_animPlayer != null && _animPlayer.HasAnimation(animName))
+		// Přičteme změnu k aktuální hodnotě
+		_progressBar.Value += change;
+
+		// DEBUG VÝPIS - Sleduj v konzoli, zda se číslo za "Nová hodnota:" hýbe
+		// GD.Print($"Nová hodnota: {_progressBar.Value}, Inside: {isFishInside}");
+
+		// 3. KONTROLA VÝHRY
+		if (_progressBar.Value >= 100)
 		{
-			if (_animPlayer.CurrentAnimation != animName)
-			{
-				_animPlayer.Play(animName);
-			}
+			WinGame();
+			return;
 		}
 
-		// Logika progressu
-		_progressBar.Value += (isFishInside ? FillSpeed : -DrainSpeed) * (float)delta;
-		_progressBar.Value = Mathf.Clamp(_progressBar.Value, 0, 100);
+		// 4. KONTROLA PROHRY - Upraveno na malou rezervu (0.1) místo čisté nuly
+		if (_progressBar.Value <= 0.1f)
+		{
+			GD.Print("DOSÁHNUTO NULY - SPOUŠTÍM LOSEGAME");
+			LoseGame();
+			return;
+		}
 
-		if (_progressBar.Value >= 100) WinGame();
-		
+		// 5. ZBYTEK ANIMACÍ (směry atd.)
+		Vector2 playerDir = _playerArea.LinearVelocity;
+		string directionName = GetDirectionName(playerDir);
+		string state = isFishInside ? "up" : "down";
+		string animName = $"fish_catched_{state}_{directionName}";
+
 		if (_animPlayer != null && _animPlayer.HasAnimation(animName))
 		{
 			if (_animPlayer.CurrentAnimation != animName)
 			{
-				GD.Print("TEĎ POUŠTÍM: " + animName); // Píše se toto v konzoli?
 				_animPlayer.Play(animName);
 			}
 		}
@@ -102,17 +109,17 @@ public partial class FishBar : CanvasLayer
 		string finalDirection = "down"; // Výchozí
 
 		if (_animPlayer != null)
-	{
-		// AssignedAnimation si pamatuje název, i když animace už dohrála do konce
-		string currentAnim = _animPlayer.AssignedAnimation; 
+		{
+			// AssignedAnimation si pamatuje název, i když animace už dohrála do konce
+			string currentAnim = _animPlayer.AssignedAnimation; 
 
-		GD.Print("Aktuálně detekovaná animace v Playerovi: " + currentAnim);
+			GD.Print("Aktuálně detekovaná animace v Playerovi: " + currentAnim);
 
-		if (currentAnim.Contains("right")) finalDirection = "right";
-		else if (currentAnim.Contains("left")) finalDirection = "left";
-		else if (currentAnim.Contains("down")) finalDirection = "down";
-		else if (currentAnim.Contains("up")) finalDirection = "up";
-	}
+			if (currentAnim.Contains("right")) finalDirection = "right";
+			else if (currentAnim.Contains("left")) finalDirection = "left";
+			else if (currentAnim.Contains("down")) finalDirection = "down";
+			else if (currentAnim.Contains("up")) finalDirection = "up";
+		}
 
 		// 2. Sestavíme název animace pro chycení (např. "fish_catched_left")
 		// Tady si dej pozor na to "c" v catched/cathed, musí to být stejné jako v AnimationPlayeru
@@ -133,6 +140,35 @@ public partial class FishBar : CanvasLayer
 		await ToSignal(GetTree().CreateTimer(0.8f), "timeout");
 
 		// 5. SMAŽEME RYBÁŘSKÝ BAR
+		this.QueueFree();
+	}
+	
+	private async void LoseGame()
+	{
+		if (_isFinished) return;
+		_isFinished = true;
+
+		GD.Print("Ryba utekla!");
+
+		if (_animPlayer != null)
+		{
+			string currentAnim = _animPlayer.AssignedAnimation;
+			string direction = "up";
+			if (currentAnim.Contains("right")) direction = "right";
+			else if (currentAnim.Contains("left")) direction = "left";
+			else if (currentAnim.Contains("down")) direction = "down";
+			
+			string failAnim = $"idle_{direction}"; 
+			_animPlayer.Play(failAnim);
+		}
+
+		await ToSignal(GetTree().CreateTimer(0.5f), "timeout");
+
+		if (_player != null)
+		{
+			_player.Set("IsFishing", false);
+		}
+
 		this.QueueFree();
 	}
 }
