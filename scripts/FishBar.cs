@@ -104,6 +104,13 @@ public partial class FishBar : CanvasLayer
 		if (_isFinished) return;
 		_isFinished = true;
 		CaughtFishCount++;
+		
+		// --- PŘIDÁNO: Přičtení peněz ---
+		if (_player != null && _player.HasMethod("AddMoney"))
+		{
+			_player.Call("AddMoney", 10); // Přidá 10 €
+			GD.Print("Peníze připsány hráči!");
+		}
 
 		// 1. Zjistíme, jakým směrem hráč právě nahazuje (předpokládáme animace cast_left, cast_right...)
 		string finalDirection = "down"; // Výchozí
