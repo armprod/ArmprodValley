@@ -21,6 +21,9 @@ public partial class Player : CharacterBody2D
 	private Timer _reactionTimer;  // Časovač na to, jak dlouho ryba kouše
 	public bool IsFishing = false;
 	
+	private int _money = 0;
+	private Label _moneyLabel;
+	
 	public override void _Ready()
 	{
 		_animPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
@@ -37,6 +40,9 @@ public partial class Player : CharacterBody2D
 		_reactionTimer.OneShot = true;
 		_reactionTimer.Connect("timeout", Callable.From(OnFishEscaped));
 		AddChild(_reactionTimer);
+		
+		_moneyLabel = GetNodeOrNull<Label>("MoneyLayout/Label");
+		UpdateMoneyUI();
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -194,5 +200,19 @@ public partial class Player : CharacterBody2D
 	{
 		CurrentFishingState = (CurrentFishingState == FishingState.None) ? FishingState.HoldingRod : FishingState.None;
 		PlayIdleAnimation();
+	}
+	
+	public void AddMoney(int amount)
+	{
+		_money += amount;
+		UpdateMoneyUI();
+	}
+	
+	private void UpdateMoneyUI()
+	{
+		if (_moneyLabel != null)
+		{
+			_moneyLabel.Text = $"{(float)_money:N2} €";
+		}
 	}
 }
