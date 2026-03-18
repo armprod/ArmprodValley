@@ -99,9 +99,9 @@ public partial class Player : CharacterBody2D
 
 	public override void _Input(InputEvent @event)
 	{
-		if (@event.IsActionPressed("slot_one")) ToggleFishingRod();
+		if (@event.IsActionPressed("slot_1")) ToggleFishingRod();
 
-		if (@event.IsActionPressed("left_click"))
+		if (@event.IsActionPressed("action_use"))
 		{	
 			HandleActionInput();
 		}
