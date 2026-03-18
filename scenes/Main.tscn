@@ -94,6 +94,8 @@ texture = ExtResource("3_nxtc6")
 2:1/0/custom_data_0 = true
 3:1/0 = 0
 3:1/0/custom_data_0 = true
+8:1/0 = 0
+9:1/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_wp0k4"]
 custom_data_layer_0/name = "can_till"

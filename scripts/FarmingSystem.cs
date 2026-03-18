@@ -7,7 +7,7 @@ public partial class FarmingSystem : Node2D
 	[Export] public TileMapLayer FarmingLayer;  // Sem budeme kreslit hlínu
 	
 	// Souřadnice v Atlasu pro okopanou hlínu (uprav podle svého TileSetu)
-	private Vector2I _tilledDirtCoords = new Vector2I(1, 0); 
+	private Vector2I _tilledDirtCoords = new Vector2I(9, 1); 
 	private int _selectedSlot = 1;
 
 	public override void _Input(InputEvent @event)
