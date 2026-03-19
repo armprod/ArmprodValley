@@ -25,7 +25,7 @@ public partial class Main : Node2D
 		if (tileData != null)
 		{
 			// 3. Načte tvůj Custom Data Layer (v C# vrací Variant, musíme přetypovat)
-			bool isFarmable = (bool)tileData.GetCustomData("is_farmable");
+			bool isFarmable = (bool)tileData.GetCustomData("can_till");
 
 			if (isFarmable)
 			{

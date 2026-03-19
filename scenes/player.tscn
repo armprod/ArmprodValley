@@ -1914,6 +1914,7 @@ libraries/ = SubResource("AnimationLibrary_sweqy")
 zoom = Vector2(2.5, 2.5)
 
 [node name="Idventory" type="Sprite2D" parent="." unique_id=1595265543]
+z_index = 2
 position = Vector2(-200, -180)
 scale = Vector2(2, 2)
 texture = ExtResource("6_tuyoq")
@@ -1921,6 +1922,7 @@ region_enabled = true
 region_rect = Rect2(0, 0, 160, 16)
 
 [node name="MoneyLayout" type="Sprite2D" parent="." unique_id=1483037059]
+z_index = 2
 position = Vector2(300, -180)
 scale = Vector2(2, 2)
 texture = ExtResource("6_tuyoq")
