@@ -1,58 +1,104 @@
 using Godot;
 using System;
 
+[GlobalClass]
 public partial class FarmingSystem : TileMapLayer
 {
 	[Export] public TileMapLayer GroundLayer;
-	// Sem v Inspectoru přetáhni svého hráče (CharacterBody2D)
+	[Export] public TileMapLayer PlantsLayer;
 	[Export] public Node2D Player; 
+	
+	[Export] private int _terrainSourceId = 0; // Atlas se zemí
+	[Export] private int _plantsSourceId = 1;  // Atlas s rostlinami
 
-	// Maximální vzdálenost v pixelech (pokud má tvá dlaždice 16px, 3 bloky = cca 48-60px)
 	[Export] public float MaxInteractionDistance = 60.0f; 
 
-	private Vector2I _tilledDirtCoords = new Vector2I(8, 1);
-	private int _sourceId = 0;
+	// Souřadnice z atlasu
+	private Vector2I _dryDirtCoords = new Vector2I(8, 1); 
+	private Vector2I _wetDirtCoords = new Vector2I(9, 1); 
+	private Vector2I _plantCoords = new Vector2I(0, 0); // Semínko v druhém atlasu
+	
 	private int _selectedSlot = 1;
 
 	public override void _Input(InputEvent @event)
+{
+	// 1. Přepínání slotů (upraveno, aby to vzalo i slot_0)
+	for (int i = 0; i <= 9; i++) // Začínáme od 0
 	{
-		// Přepínání slotů zůstává stejné
-		for (int i = 1; i <= 5; i++)
+		string actionName = "slot_" + i;
+		if (InputMap.HasAction(actionName)) 
 		{
-			if (Input.IsActionJustPressed("slot_" + i))
+			if (Input.IsActionJustPressed(actionName))
 			{
 				_selectedSlot = i;
-			}
-		}
-
-		if (@event is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
-		{
-			if (_selectedSlot == 5)
-			{
-				TillGround(GetGlobalMousePosition());
+				GD.Print("Vybrán slot: " + _selectedSlot);
 			}
 		}
 	}
 
-	private void TillGround(Vector2 mouseGlobalPos)
+	if (Input.IsActionJustPressed("action_use"))
 	{
-		if (GroundLayer == null || Player == null) 
+		Vector2 mousePos = GetGlobalMousePosition();
+
+		if (Player != null && Player.GlobalPosition.DistanceTo(mousePos) > MaxInteractionDistance)
 		{
-			GD.Print("Chybí GroundLayer nebo Player v Inspectoru!");
+			GD.Print("Příliš daleko!");
 			return;
 		}
 
-		// 1. VÝPOČET VZDÁLENOSTI
-		float distance = Player.GlobalPosition.DistanceTo(mouseGlobalPos);
-
-		if (distance > MaxInteractionDistance)
+		// Logika podle vybraného slotu
+		if (_selectedSlot == 4) 
 		{
-			GD.Print($"Příliš daleko! Vzdálenost: {distance}, Limit: {MaxInteractionDistance}");
-			return; // Hráč je moc daleko, nic se nestane
+			HandleTilling(mousePos);
 		}
+		else if (_selectedSlot == 5) 
+		{
+			WaterGround(mousePos);
+		}
+		else if (_selectedSlot == 0)
+		{
+			GD.Print("Sázím semínka slot 0");
+			HandlePlanting(mousePos);
+		}
+	}
+}
 
-		// 2. LOGIKA OKOPÁVÁNÍ (stejná jako předtím)
-		Vector2I tilePos = GroundLayer.LocalToMap(GroundLayer.ToLocal(mouseGlobalPos));
+	private void WaterGround(Vector2 mousePos)
+	{
+		Vector2I tilePos = LocalToMap(ToLocal(mousePos));
+		if (GetCellAtlasCoords(tilePos) == _dryDirtCoords)
+		{
+			// Použijeme _terrainSourceId (země)
+			SetCell(tilePos, _terrainSourceId, _wetDirtCoords);
+			GD.Print("Půda zalita.");
+		}
+	}
+
+	private void HandlePlanting(Vector2 mousePos)
+	{
+		if (PlantsLayer == null) return;
+		Vector2I tilePos = LocalToMap(ToLocal(mousePos));
+
+		// Kontrola, jestli je pod námi hlína (v tvém případě mokrá i suchá, jak jsme chtěli)
+		Vector2I groundTile = GetCellAtlasCoords(tilePos);
+		if (groundTile == _wetDirtCoords || groundTile == _dryDirtCoords)
+		{
+			if (PlantsLayer.GetCellSourceId(tilePos) == 1)
+			{
+				// DŮLEŽITÉ: Použijeme _plantsSourceId pro rostliny!
+				PlantsLayer.SetCell(tilePos, _plantsSourceId, _plantCoords);
+				GD.Print("Zasazeno semínko!");
+			}
+		}
+		else 
+		{
+			GD.Print("Tady není vykopaná hlína.");
+		}
+	}
+	
+	private void HandleTilling(Vector2 mousePos)
+	{
+		Vector2I tilePos = GroundLayer.LocalToMap(GroundLayer.ToLocal(mousePos));
 		TileData tileData = GroundLayer.GetCellTileData(tilePos);
 
 		if (tileData != null)
@@ -60,11 +106,9 @@ public partial class FarmingSystem : TileMapLayer
 			var canTill = tileData.GetCustomData("can_till");
 			if (canTill.VariantType != Variant.Type.Nil && (bool)canTill)
 			{
-				if (GetCellSourceId(tilePos) == -1)
-				{
-					SetCell(tilePos, _sourceId, _tilledDirtCoords);
-					GD.Print("Okopáno v dosahu!");
-				}
+				// Použijeme _terrainSourceId (země)
+				SetCell(tilePos, _terrainSourceId, _dryDirtCoords); 
+				GD.Print($"ÚSPĚCH: Kopu na {tilePos}");
 			}
 		}
 	}
