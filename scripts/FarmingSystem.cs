@@ -22,7 +22,6 @@ public partial class FarmingSystem : TileMapLayer
 
 	public override void _Input(InputEvent @event)
 {
-	// 1. Přepínání slotů (upraveno, aby to vzalo i slot_0)
 	for (int i = 0; i <= 9; i++) // Začínáme od 0
 	{
 		string actionName = "slot_" + i;
