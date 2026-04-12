@@ -81,16 +81,18 @@ public partial class Player : CharacterBody2D
 	public override void _Input(InputEvent @event)
 	{
 		// Detekce slotů pro nástroje
-		if (@event.IsActionPressed("slot_1")) _currentToolSuffix = "_sword";
+		if (@event.IsActionPressed("slot_0")) _currentToolSuffix = "_seed";
+		else if (@event.IsActionPressed("slot_1")) _currentToolSuffix = "_sword";
 		else if (@event.IsActionPressed("slot_2")) _currentToolSuffix = "_pickaxe";
 		else if (@event.IsActionPressed("slot_3")) _currentToolSuffix = "_axe";
 		else if (@event.IsActionPressed("slot_4")) _currentToolSuffix = "_hoe";
-		else if (@event.IsActionPressed("slot_6")) {
+		else if (@event.IsActionPressed("slot_5")) _currentToolSuffix = "_can";
+		else if (@event.IsActionPressed("slot_7")) {
 			ToggleFishingRod();
 			_currentToolSuffix = (CurrentFishingState != FishingState.None) ? "_rod" : "";
 		}
 		// Ostatní sloty (třeba prázdná ruka)
-		else if (@event.IsActionPressed("slot_7") || @event.IsActionPressed("slot_8")) _currentToolSuffix = "";
+		else if (@event.IsActionPressed("slot_8") || @event.IsActionPressed("slot_9")) _currentToolSuffix = "";
 
 		if (@event.IsActionPressed("action_use"))
 		{	
@@ -105,6 +107,7 @@ public partial class Player : CharacterBody2D
 		string suffix = (CurrentFishingState != FishingState.None) ? "_rod" : _currentToolSuffix;
 
 		_animPlayer.Play("walk_" + animBase + suffix);
+		_animPlayer.Advance(0);
 	}
 
 	private void PlayIdleAnimation()
@@ -237,4 +240,19 @@ public partial class Player : CharacterBody2D
 			_moneyLabel.Text = $"{(float)_money:N2} €";
 		}
 	}
+	
+	//private void PlayPlantingAnimation()
+	//{
+		//string animBase = GetDirectionName(_lastDirection);
+		//string animName = "use_" + animBase + "_seed";
+		//
+		//if(_animPlayer.HasAnimation(animName))
+		//{
+			//_animPlayer.Play(animName);
+		//}
+		//else 
+		//{
+			//GD.Print("Animace {animName} nenalezena.");
+		//}
+	//}
 }

@@ -28,6 +28,8 @@ sources/0 = SubResource("TileSetAtlasSource_lhr70")
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wp0k4"]
 texture = ExtResource("5_nxtc6")
+0:1/0 = 0
+1:1/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_bjd11"]
 sources/1 = SubResource("TileSetAtlasSource_wp0k4")
