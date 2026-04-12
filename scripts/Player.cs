@@ -24,6 +24,9 @@ public partial class Player : CharacterBody2D
 	private int _money = 0;
 	private Label _moneyLabel;
 	
+	// Akluální nástroj
+	private string _currentToolSuffix = "";
+	
 	public override void _Ready()
 	{
 		_animPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
@@ -74,17 +77,42 @@ public partial class Player : CharacterBody2D
 		Velocity = velocity;
 		MoveAndSlide();
 	}
+	
+	public override void _Input(InputEvent @event)
+	{
+		// Detekce slotů pro nástroje
+		if (@event.IsActionPressed("slot_0")) _currentToolSuffix = "_seed";
+		else if (@event.IsActionPressed("slot_1")) _currentToolSuffix = "_sword";
+		else if (@event.IsActionPressed("slot_2")) _currentToolSuffix = "_pickaxe";
+		else if (@event.IsActionPressed("slot_3")) _currentToolSuffix = "_axe";
+		else if (@event.IsActionPressed("slot_4")) _currentToolSuffix = "_hoe";
+		else if (@event.IsActionPressed("slot_5")) _currentToolSuffix = "_can";
+		else if (@event.IsActionPressed("slot_7")) {
+			ToggleFishingRod();
+			_currentToolSuffix = (CurrentFishingState != FishingState.None) ? "_rod" : "";
+		}
+		// Ostatní sloty (třeba prázdná ruka)
+		else if (@event.IsActionPressed("slot_8") || @event.IsActionPressed("slot_9")) _currentToolSuffix = "";
+
+		if (@event.IsActionPressed("action_use"))
+		{	
+			HandleActionInput();
+		}
+	}
 
 	private void UpdateAnimation(Vector2 dir)
 	{
-		string suffix = (CurrentFishingState != FishingState.None) ? "_rod" : "";
 		string animBase = GetDirectionName(dir);
+		// Prioritu má stav rybaření, pak suffix vybraného nástroje
+		string suffix = (CurrentFishingState != FishingState.None) ? "_rod" : _currentToolSuffix;
+
 		_animPlayer.Play("walk_" + animBase + suffix);
+		_animPlayer.Advance(0);
 	}
 
 	private void PlayIdleAnimation()
 	{
-		// Pokud čekáme nebo hrajeme minihru, nebudeme přehrávat standardní Idle
+		// Ignorujeme idle během aktivních fází rybaření
 		if (CurrentFishingState == FishingState.WaitingForBite || 
 			CurrentFishingState == FishingState.FishBiting || 
 			CurrentFishingState == FishingState.FishingMiniGame)
@@ -92,19 +120,10 @@ public partial class Player : CharacterBody2D
 			return; 
 		}
 
-		string suffix = (CurrentFishingState != FishingState.None) ? "_rod" : "";
 		string animBase = GetDirectionName(_lastDirection);
+		string suffix = (CurrentFishingState != FishingState.None) ? "_rod" : _currentToolSuffix;
+
 		_animPlayer.Play("idle_" + animBase + suffix);
-	}
-
-	public override void _Input(InputEvent @event)
-	{
-		if (@event.IsActionPressed("slot_one")) ToggleFishingRod();
-
-		if (@event.IsActionPressed("left_click"))
-		{	
-			HandleActionInput();
-		}
 	}
 
 	private void HandleActionInput()
@@ -126,8 +145,8 @@ public partial class Player : CharacterBody2D
 				_reactionTimer.Stop();
 				StartFishingBar(); // Voláme metodu pro zobrazení scény
 				break;
-		} // Konec switche
-	} // Konec metody
+		}
+	}
 
 	private void StartCasting()
 	{
@@ -151,10 +170,8 @@ public partial class Player : CharacterBody2D
 		GD.Print("RYBA KOUŠE!");
 		CurrentFishingState = FishingState.FishBiting;
 		
-		// Pustíme animaci cukání prutu
 		_animPlayer.Play("bite_" + GetDirectionName(_lastDirection));
 		
-		// Spustíme okno pro reakci
 		_reactionTimer.Start(ReactionWindow);
 	}
 
@@ -166,7 +183,6 @@ public partial class Player : CharacterBody2D
 
 	private void StartFishingBar()
 	{
-		// Použij název FishingBarScene, který máš definovaný nahoře
 		if (FishingBarScene == null) return; 
 
 		CurrentFishingState = FishingState.FishingMiniGame;
@@ -197,10 +213,19 @@ public partial class Player : CharacterBody2D
 	}
 
 	private void ToggleFishingRod()
+{
+	if (CurrentFishingState == FishingState.None)
 	{
-		CurrentFishingState = (CurrentFishingState == FishingState.None) ? FishingState.HoldingRod : FishingState.None;
-		PlayIdleAnimation();
+		CurrentFishingState = FishingState.HoldingRod;
+		_currentToolSuffix = "_rod"; // Nastavíme suffix prutu
 	}
+	else
+	{
+		CurrentFishingState = FishingState.None;
+		_currentToolSuffix = ""; // Resetujeme na prázdné ruce
+	}
+	PlayIdleAnimation();
+}
 	
 	public void AddMoney(int amount)
 	{
@@ -215,4 +240,19 @@ public partial class Player : CharacterBody2D
 			_moneyLabel.Text = $"{(float)_money:N2} €";
 		}
 	}
+	
+	//private void PlayPlantingAnimation()
+	//{
+		//string animBase = GetDirectionName(_lastDirection);
+		//string animName = "use_" + animBase + "_seed";
+		//
+		//if(_animPlayer.HasAnimation(animName))
+		//{
+			//_animPlayer.Play(animName);
+		//}
+		//else 
+		//{
+			//GD.Print("Animace {animName} nenalezena.");
+		//}
+	//}
 }

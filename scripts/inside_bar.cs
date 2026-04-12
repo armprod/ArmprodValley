@@ -14,7 +14,7 @@ public partial class inside_bar : RigidBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (Input.IsActionPressed("left_click"))
+		if (Input.IsActionPressed("action_use"))
 		{
 			// CentralForce tlačí kontinuálně, směr nahoru je záporné Y
 			ApplyCentralForce(new Vector2(0, -LiftForce));
