@@ -30,6 +30,10 @@ sources/0 = SubResource("TileSetAtlasSource_lhr70")
 texture = ExtResource("5_nxtc6")
 0:1/0 = 0
 1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_bjd11"]
 sources/1 = SubResource("TileSetAtlasSource_wp0k4")

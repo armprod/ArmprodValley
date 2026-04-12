@@ -108,7 +108,7 @@ public partial class FishBar : CanvasLayer
 		// --- PŘIDÁNO: Přičtení peněz ---
 		if (_player != null && _player.HasMethod("AddMoney"))
 		{
-			_player.Call("AddMoney", 10); // Přidá 10 €
+			_player.Call("AddMoney", 50); // Přidá 50 €
 			GD.Print("Peníze připsány hráči!");
 		}
 

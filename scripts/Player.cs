@@ -3,9 +3,19 @@ using System;
 
 public partial class Player : CharacterBody2D
 {
+	[Export] public TileMapLayer WaterLayer;
+	private AnimationPlayer _animPlayer;
+	private Vector2 _lastDirection = Vector2.Down;
+	private int _money = 0;
+	private Label _moneyLabel;
+	
+	// Akluální nástroj
+	private string _currentToolSuffix = "";
+	
 	public enum FishingState { None, HoldingRod, Casting, WaitingForBite, FishBiting, FishingMiniGame }
 	public FishingState CurrentFishingState = FishingState.None;
 
+	// Fishing minigame
 	[Export] public float Speed = 100.0f;
 	[Export] public float MinWaitTime = 2.0f;
 	[Export] public float MaxWaitTime = 6.0f;
@@ -13,19 +23,9 @@ public partial class Player : CharacterBody2D
 	[Export] public PackedScene FishingBarScene;
 	private Node _activeFishingBar;
 
-	[Export] public TileMapLayer WaterLayer;
-
-	private AnimationPlayer _animPlayer;
-	private Vector2 _lastDirection = Vector2.Down;
 	private Timer _fishingTimer;   // Časovač na čekání na rybu
 	private Timer _reactionTimer;  // Časovač na to, jak dlouho ryba kouše
 	public bool IsFishing = false;
-	
-	private int _money = 0;
-	private Label _moneyLabel;
-	
-	// Akluální nástroj
-	private string _currentToolSuffix = "";
 	
 	public override void _Ready()
 	{
@@ -91,7 +91,7 @@ public partial class Player : CharacterBody2D
 			ToggleFishingRod();
 			_currentToolSuffix = (CurrentFishingState != FishingState.None) ? "_rod" : "";
 		}
-		// Ostatní sloty (třeba prázdná ruka)
+		// Ostatní sloty (prázdná ruka)
 		else if (@event.IsActionPressed("slot_8") || @event.IsActionPressed("slot_9")) _currentToolSuffix = "";
 
 		if (@event.IsActionPressed("action_use"))
