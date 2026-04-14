@@ -4,41 +4,41 @@ using System;
 public partial class Player : CharacterBody2D
 {
 	[Export] public TileMapLayer WaterLayer;
+	[Export] public float Speed = 100.0f;
+	
 	private AnimationPlayer _animPlayer;
-	private Vector2 _lastDirection = Vector2.Down;
 	private int _money = 0;
 	private Label _moneyLabel;
 	
-	// Akluální nástroj
+	// --- SYSTÉM NÁSTROJŮ A ANIMACÍ ---
 	private string _currentToolSuffix = "";
-	
+	private bool _isActing = false;
+	private Vector2 _lookDirection = Vector2.Down; // Pro uchování směru (Vector2)
+	private string _lastDirStr = "down";           // Pro textový název směru
+
+	// --- RYBAŘENÍ ---
 	public enum FishingState { None, HoldingRod, Casting, WaitingForBite, FishBiting, FishingMiniGame }
 	public FishingState CurrentFishingState = FishingState.None;
 
-	// Fishing minigame
-	[Export] public float Speed = 100.0f;
 	[Export] public float MinWaitTime = 2.0f;
 	[Export] public float MaxWaitTime = 6.0f;
-	[Export] public float ReactionWindow = 1.5f; // Jak dlouho má hráč na kliknutí při záběru
+	[Export] public float ReactionWindow = 1.5f; 
 	[Export] public PackedScene FishingBarScene;
 	private Node _activeFishingBar;
 
-	private Timer _fishingTimer;   // Časovač na čekání na rybu
-	private Timer _reactionTimer;  // Časovač na to, jak dlouho ryba kouše
-	public bool IsFishing = false;
+	private Timer _fishingTimer;
+	private Timer _reactionTimer;
 	
 	public override void _Ready()
 	{
 		_animPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 		_animPlayer.AnimationFinished += OnAnimationFinished;
 
-		// Časovač 1: Čekání na rybu
 		_fishingTimer = new Timer();
 		_fishingTimer.OneShot = true;
 		_fishingTimer.Connect("timeout", Callable.From(OnFishBiteStarts));
 		AddChild(_fishingTimer);
 
-		// Časovač 2: Reakce hráče na záběr
 		_reactionTimer = new Timer();
 		_reactionTimer.OneShot = true;
 		_reactionTimer.Connect("timeout", Callable.From(OnFishEscaped));
@@ -50,8 +50,7 @@ public partial class Player : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (IsFishing) return; // Pokud rybaří, skript hráče do animací nekecá
-		// STOPKA: Pokud se rybaří, hráč se nehýbe
+		// 1. RYBAŘENÍ: Tady postavu zastavíme (kromě držení prutu)
 		if (CurrentFishingState != FishingState.None && CurrentFishingState != FishingState.HoldingRod)
 		{
 			Velocity = Vector2.Zero;
@@ -59,27 +58,38 @@ public partial class Player : CharacterBody2D
 			return;
 		}
 
+		// 2. POHYB: Ten poběží VŽDY, i když _isActing je true
 		Vector2 direction = Input.GetVector("left", "right", "up", "down");
-		Vector2 velocity = Velocity;
-
+		
 		if (direction != Vector2.Zero)
 		{
-			_lastDirection = direction;
-			velocity = direction * Speed;
-			UpdateAnimation(direction);
+			_lookDirection = direction;
+			_lastDirStr = GetDirectionName(direction);
+			Velocity = direction * Speed;
+			
+			// Animaci chůze pustíme jen tehdy, pokud zrovna nepoužíváme nástroj
+			if (!_isActing) 
+			{
+				UpdateAnimation(direction);
+			}
 		}
 		else
 		{
-			velocity = velocity.MoveToward(Vector2.Zero, Speed);
-			PlayIdleAnimation();
+			Velocity = Velocity.MoveToward(Vector2.Zero, Speed);
+			if (!_isActing) // Idle pustíme jen pokud se nic neděje
+			{
+				PlayIdleAnimation();
+			}
 		}
 
-		Velocity = velocity;
 		MoveAndSlide();
 	}
 	
 	public override void _Input(InputEvent @event)
 	{
+		// Pokud hráč právě provádí akci, ignorujeme změnu slotů a vstupy
+		if (_isActing) return;
+
 		// Detekce slotů pro nástroje
 		if (@event.IsActionPressed("slot_0")) _currentToolSuffix = "_seed";
 		else if (@event.IsActionPressed("slot_1")) _currentToolSuffix = "_sword";
@@ -87,12 +97,16 @@ public partial class Player : CharacterBody2D
 		else if (@event.IsActionPressed("slot_3")) _currentToolSuffix = "_axe";
 		else if (@event.IsActionPressed("slot_4")) _currentToolSuffix = "_hoe";
 		else if (@event.IsActionPressed("slot_5")) _currentToolSuffix = "_can";
-		else if (@event.IsActionPressed("slot_7")) {
+		else if (@event.IsActionPressed("slot_6")) _currentToolSuffix = "_scythe";
+		else if (@event.IsActionPressed("slot_7")) 
+		{
 			ToggleFishingRod();
-			_currentToolSuffix = (CurrentFishingState != FishingState.None) ? "_rod" : "";
 		}
-		// Ostatní sloty (prázdná ruka)
-		else if (@event.IsActionPressed("slot_8") || @event.IsActionPressed("slot_9")) _currentToolSuffix = "";
+		else if (@event.IsActionPressed("slot_8") || @event.IsActionPressed("slot_9")) 
+		{
+			_currentToolSuffix = "";
+			CurrentFishingState = FishingState.None;
+		}
 
 		if (@event.IsActionPressed("action_use"))
 		{	
@@ -102,91 +116,105 @@ public partial class Player : CharacterBody2D
 
 	private void UpdateAnimation(Vector2 dir)
 	{
+		if (_isActing) return;
+		
 		string animBase = GetDirectionName(dir);
-		// Prioritu má stav rybaření, pak suffix vybraného nástroje
 		string suffix = (CurrentFishingState != FishingState.None) ? "_rod" : _currentToolSuffix;
-
 		_animPlayer.Play("walk_" + animBase + suffix);
-		_animPlayer.Advance(0);
 	}
 
 	private void PlayIdleAnimation()
 	{
-		// Ignorujeme idle během aktivních fází rybaření
+		if (_isActing) return;
 		if (CurrentFishingState == FishingState.WaitingForBite || 
 			CurrentFishingState == FishingState.FishBiting || 
-			CurrentFishingState == FishingState.FishingMiniGame)
-		{
-			return; 
-		}
+			CurrentFishingState == FishingState.FishingMiniGame) return; 
 
-		string animBase = GetDirectionName(_lastDirection);
 		string suffix = (CurrentFishingState != FishingState.None) ? "_rod" : _currentToolSuffix;
-
-		_animPlayer.Play("idle_" + animBase + suffix);
+		_animPlayer.Play("idle_" + _lastDirStr + suffix);
 	}
 
 	private void HandleActionInput()
 	{
-		switch (CurrentFishingState)
+		// Pokud máme prut, řešíme rybářskou logiku
+		if (CurrentFishingState != FishingState.None)
 		{
-			case FishingState.HoldingRod:
-				if (IsFacingWater()) StartCasting();
-				break;
+			switch (CurrentFishingState)
+			{
+				case FishingState.HoldingRod:
+					if (IsFacingWater()) StartCasting();
+					break;
+				case FishingState.WaitingForBite:
+					ResetFishing();
+					break;
+				case FishingState.FishBiting:
+					_reactionTimer.Stop();
+					StartFishingBar();
+					break;
+			}
+			return;
+		}
 
-			case FishingState.WaitingForBite:
-				GD.Print("Moc brzo! Rybu jsi vyplašil.");
-				_fishingTimer.Stop();
-				ResetFishing();
-				break;
-
-			case FishingState.FishBiting:
-				GD.Print("ZÁSEK! Jdeme na minihru.");
-				_reactionTimer.Stop();
-				StartFishingBar(); // Voláme metodu pro zobrazení scény
-				break;
+		// Pokud máme jiný nástroj (ne prut), spustíme akční animaci
+		if (!string.IsNullOrEmpty(_currentToolSuffix))
+		{
+			PlayToolAnimation();
 		}
 	}
 
-	private void StartCasting()
+	private void PlayToolAnimation()
 	{
-		CurrentFishingState = FishingState.Casting;
-		_animPlayer.Play("cast_" + GetDirectionName(_lastDirection));
+		string toolName = _currentToolSuffix.TrimStart('_');
+		string animName = $"use_{_lastDirStr}_{toolName}";
+
+		if (_animPlayer.HasAnimation(animName))
+		{
+			_isActing = true;
+			_animPlayer.Play(animName);
+		}
 	}
 
 	private void OnAnimationFinished(StringName animName)
 	{
-		if (animName.ToString().StartsWith("cast_"))
+		string aName = animName.ToString();
+
+		// Pokud skončila animace nahazování
+		if (aName.StartsWith("cast_"))
 		{
 			CurrentFishingState = FishingState.WaitingForBite;
 			float waitTime = (float)GD.RandRange(MinWaitTime, MaxWaitTime);
 			_fishingTimer.Start(waitTime);
-			GD.Print($"Nahozeno. Čekám...");
 		}
+		// Pokud skončila jakákoliv akční animace nástroje
+		else if (aName.StartsWith("use_"))
+		{
+			_isActing = false;
+		}
+	}
+
+	// --- POMOCNÉ METODY PRO RYBAŘENÍ ---
+	private void StartCasting()
+	{
+		CurrentFishingState = FishingState.Casting;
+		_animPlayer.Play("cast_" + _lastDirStr);
 	}
 
 	private void OnFishBiteStarts()
 	{
-		GD.Print("RYBA KOUŠE!");
 		CurrentFishingState = FishingState.FishBiting;
-		
-		_animPlayer.Play("bite_" + GetDirectionName(_lastDirection));
-		
+		_animPlayer.Play("bite_" + _lastDirStr);
 		_reactionTimer.Start(ReactionWindow);
 	}
 
 	private void OnFishEscaped()
 	{
-		GD.Print("Ryba utekla, byl jsi pomalý.");
 		ResetFishing();
 	}
 
 	private void StartFishingBar()
 	{
 		if (FishingBarScene == null) return; 
-
 		CurrentFishingState = FishingState.FishingMiniGame;
-		
 		_activeFishingBar = FishingBarScene.Instantiate();
 		GetTree().Root.AddChild(_activeFishingBar);
 	}
@@ -194,13 +222,29 @@ public partial class Player : CharacterBody2D
 	private void ResetFishing()
 	{
 		CurrentFishingState = FishingState.HoldingRod;
+		_isActing = false;
+		PlayIdleAnimation();
+	}
+
+	private void ToggleFishingRod()
+	{
+		if (CurrentFishingState == FishingState.None)
+		{
+			CurrentFishingState = FishingState.HoldingRod;
+			_currentToolSuffix = "_rod";
+		}
+		else
+		{
+			CurrentFishingState = FishingState.None;
+			_currentToolSuffix = "";
+		}
 		PlayIdleAnimation();
 	}
 
 	private bool IsFacingWater()
 	{
 		if (WaterLayer == null) return false;
-		Vector2 checkPos = GlobalPosition + (_lastDirection * 24);
+		Vector2 checkPos = GlobalPosition + (_lookDirection * 24);
 		Vector2I tilePos = WaterLayer.LocalToMap(WaterLayer.ToLocal(checkPos));
 		return WaterLayer.GetCellTileData(tilePos) != null;
 	}
@@ -212,21 +256,6 @@ public partial class Player : CharacterBody2D
 		return dir.Y > 0 ? "down" : "up";
 	}
 
-	private void ToggleFishingRod()
-{
-	if (CurrentFishingState == FishingState.None)
-	{
-		CurrentFishingState = FishingState.HoldingRod;
-		_currentToolSuffix = "_rod"; // Nastavíme suffix prutu
-	}
-	else
-	{
-		CurrentFishingState = FishingState.None;
-		_currentToolSuffix = ""; // Resetujeme na prázdné ruce
-	}
-	PlayIdleAnimation();
-}
-	
 	public void AddMoney(int amount)
 	{
 		_money += amount;
@@ -237,22 +266,7 @@ public partial class Player : CharacterBody2D
 	{
 		if (_moneyLabel != null)
 		{
-			_moneyLabel.Text = $"{(float)_money:N2} €";
+			_moneyLabel.Text = $"{_money:N2} €";
 		}
 	}
-	
-	//private void PlayPlantingAnimation()
-	//{
-		//string animBase = GetDirectionName(_lastDirection);
-		//string animName = "use_" + animBase + "_seed";
-		//
-		//if(_animPlayer.HasAnimation(animName))
-		//{
-			//_animPlayer.Play(animName);
-		//}
-		//else 
-		//{
-			//GD.Print("Animace {animName} nenalezena.");
-		//}
-	//}
 }
