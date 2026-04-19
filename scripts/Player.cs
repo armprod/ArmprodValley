@@ -3,7 +3,11 @@ using System;
 
 public partial class Player : CharacterBody2D
 {
-	public int Money => _money;
+	public int Money 
+	{ 
+		get => _money; 
+		set { _money = value; UpdateMoneyUI(); } 
+	}
 
 	[Export] public TileMapLayer WaterLayer;
 	[Export] public float Speed = 100.0f;
@@ -33,7 +37,14 @@ public partial class Player : CharacterBody2D
 		UpdateMoneyUI();
 
 		if (SaveManager.Instance != null && SaveManager.Instance.IsLoadingQueued)
-			SaveManager.Instance.LoadGame(this);
+		{
+			SaveData data = SaveManager.Instance.LoadGame(); // Tady nesmí být 'this'
+			if (data != null) 
+			{
+				this.GlobalPosition = data.PlayerPosition;
+				this.Money = data.Money; // Tohle teď bude fungovat díky opravě v bodě 1
+			}
+		}
 	}
 
 	public override void _PhysicsProcess(double delta)

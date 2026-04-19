@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://in85dd45cg1j"]
+
+[ext_resource type="Script" uid="uid://c5c3bmkxcr2b4" path="res://scripts/PauseMenu.cs" id="1_jvnd5"]
+[ext_resource type="FontFile" uid="uid://cnp0fwojltvh0" path="res://assets/fonts/m5x7.ttf" id="2_g4jo0"]
+
+[node name="PauseMenu" type="CanvasLayer" unique_id=1032111199 node_paths=PackedStringArray("MenuRoot")]
+process_mode = 3
+layer = 10
+script = ExtResource("1_jvnd5")
+MenuRoot = NodePath("MenuRoot")
+
+[node name="MenuRoot" type="ColorRect" parent="." unique_id=1426683207]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.19607843)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuRoot" unique_id=988757903]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -48.0
+offset_right = 77.0
+offset_bottom = 48.0
+grow_vertical = 2
+scale = Vector2(5, 5)
+
+[node name="ResumeButton" type="Button" parent="MenuRoot/VBoxContainer" unique_id=1154816414]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_g4jo0")
+text = "Resume Game"
+
+[node name="SaveButton" type="Button" parent="MenuRoot/VBoxContainer" unique_id=1527871406]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_g4jo0")
+text = "Save Game"
+
+[node name="SettingsButton" type="Button" parent="MenuRoot/VBoxContainer" unique_id=1978583370]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_g4jo0")
+text = "Settings"
+
+[node name="QuitButton" type="Button" parent="MenuRoot/VBoxContainer" unique_id=719984261]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_g4jo0")
+text = "Quit Game"
+
+[connection signal="pressed" from="MenuRoot/VBoxContainer/ResumeButton" to="." method="OnResumeButtonPressed"]
+[connection signal="pressed" from="MenuRoot/VBoxContainer/SaveButton" to="." method="OnSaveButtonPressed"]
+[connection signal="pressed" from="MenuRoot/VBoxContainer/QuitButton" to="." method="OnQuitButtonPressed"]

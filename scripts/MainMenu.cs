@@ -10,8 +10,6 @@ public partial class MainMenu : Control
 
 	public override void _Ready()
 	{
-		// 1. Najdeme tlačítka (ujisti se, že názvy v závorkách odpovídají názvům uzlů v editoru)
-		// Předpokládám strukturu: MainMenu -> VBoxContainer -> Buttony
 		var newGameBtn = GetNode<Button>("VBoxContainer/NewGameButton");
 		var loadGameBtn = GetNode<Button>("VBoxContainer/LoadGameButton");
 		var settingsBtn = GetNode<Button>("VBoxContainer/SettingsButton");

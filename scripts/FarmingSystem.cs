@@ -208,4 +208,21 @@ public partial class FarmingSystem : TileMapLayer
 			GD.Print("Rostlina na zničeném poli byla odstraněna.");
 		}
 	}
+	
+	public List<TileSaveData> GetSaveData()
+	{
+		var list = new List<TileSaveData>();
+		
+		foreach (Vector2I pos in GroundLayer.GetUsedCells())
+		{
+			TileSaveData tile = new TileSaveData();
+			tile.Pos = pos;
+			tile.GroundAtlasPos = GroundLayer.GetCellAtlasCoords(pos);
+			tile.HasPlant = _trackedPlants.ContainsKey(pos);
+			tile.PlantStartTime = tile.HasPlant ? _trackedPlants[pos] : 0;
+			
+			list.Add(tile);
+		}
+		return list;
+	}
 }
