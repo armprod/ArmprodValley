@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://bon48p2kwrl2l"]
+
+[ext_resource type="Script" uid="uid://chxngudm214bn" path="res://scripts/MainMenu.cs" id="1_0ykhv"]
+[ext_resource type="Texture2D" uid="uid://cd5hksjvvbblb" path="res://assets/other/3.png" id="1_yqorp"]
+
+[node name="MainMenu" type="Control" unique_id=594523750]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_0ykhv")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1774796383]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -281.5
+offset_right = 500.0
+offset_bottom = 281.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_yqorp")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1544173412]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="NewGameButton" type="Button" parent="VBoxContainer" unique_id=1795096161]
+layout_mode = 2
+text = "Start New Game"
+
+[node name="LoadGameButton" type="Button" parent="VBoxContainer" unique_id=447461290]
+layout_mode = 2
+
+[node name="SettingsButton" type="Button" parent="VBoxContainer" unique_id=642563292]
+layout_mode = 2
+
+[node name="QuitButton" type="Button" parent="VBoxContainer" unique_id=1473752883]
+layout_mode = 2
+
+[node name="SettingsPanel" type="Panel" parent="." unique_id=1996192919]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="SettingsPanel" unique_id=113654020]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="CloseSettingsButton" type="Button" parent="SettingsPanel" unique_id=2102151888]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
