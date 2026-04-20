@@ -3,7 +3,8 @@ using System;
 
 public partial class PauseMenu : CanvasLayer
 {
-	[Export] public Control MenuRoot; 
+	[Export] public Control MenuRoot;
+	[Export] public Control SettingsMenuNode;
 
 	public override void _Ready()
 	{
@@ -88,6 +89,24 @@ public partial class PauseMenu : CanvasLayer
 		{
 			GD.PrintErr("SaveManager nenalezen!");
 		}
+	}
+	
+	public void OnSettingsButtonPressed()
+	{
+		GD.Print("1. Kliknuto na Settings!");
+
+		if (MenuRoot == null || SettingsMenuNode == null)
+		{
+			GD.PrintErr("2. CHYBA: MenuRoot nebo SettingsMenuNode není propojen v Inspektoru!");
+			return;
+		}
+
+		GD.Print("3. Schovávám MenuRoot a zapínám Settings...");
+		
+		MenuRoot.Hide(); 
+		SettingsMenuNode.Show();
+		
+		GD.Print("4. Hotovo. MenuRoot visible: " + MenuRoot.Visible + " | Settings visible: " + SettingsMenuNode.Visible);
 	}
 
 	public void OnQuitButtonPressed()

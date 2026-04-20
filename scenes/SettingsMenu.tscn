@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://768uhvuk1orr"]
+
+[ext_resource type="Script" uid="uid://l53ed8uu6a8s" path="res://scripts/SettingsMenu.cs" id="1_yelko"]
+
+[node name="SettingsMenu" type="Control" unique_id=1599266557 node_paths=PackedStringArray("VolumeSlider", "ResOption")]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_yelko")
+VolumeSlider = NodePath("ColorRect/MarginContainer/VBoxContainer/HSeparator/VolumeRow/Volume/VolumeSlider")
+ResOption = NodePath("ColorRect/MarginContainer/VBoxContainer/HSeparator/ResolutionRow/Resolution/ResolutionOptionButton")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=704843060]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0, 0, 0, 0.19607843)
+metadata/_edit_group_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="ColorRect" unique_id=1677324936]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1195.0
+offset_top = 294.0
+offset_right = 1595.0
+offset_bottom = 694.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/MarginContainer" unique_id=2085812383]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="ColorRect/MarginContainer/VBoxContainer" unique_id=254166298]
+layout_mode = 2
+text = "Setting"
+
+[node name="HSeparator" type="HSeparator" parent="ColorRect/MarginContainer/VBoxContainer" unique_id=1627222930]
+layout_mode = 2
+
+[node name="VolumeRow" type="HBoxContainer" parent="ColorRect/MarginContainer/VBoxContainer/HSeparator" unique_id=1971128895]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Volume" type="Label" parent="ColorRect/MarginContainer/VBoxContainer/HSeparator/VolumeRow" unique_id=489825939]
+layout_mode = 2
+text = "Volume"
+
+[node name="VolumeSlider" type="HSlider" parent="ColorRect/MarginContainer/VBoxContainer/HSeparator/VolumeRow/Volume" unique_id=558025485]
+layout_mode = 0
+offset_left = 83.0
+offset_right = 91.0
+offset_bottom = 16.0
+
+[node name="ResolutionRow" type="HBoxContainer" parent="ColorRect/MarginContainer/VBoxContainer/HSeparator" unique_id=1537591576]
+layout_mode = 0
+offset_top = 40.0
+offset_right = 83.0
+offset_bottom = 80.0
+
+[node name="Resolution" type="Label" parent="ColorRect/MarginContainer/VBoxContainer/HSeparator/ResolutionRow" unique_id=269476040]
+layout_mode = 2
+text = "Resolution"
+
+[node name="ResolutionOptionButton" type="OptionButton" parent="ColorRect/MarginContainer/VBoxContainer/HSeparator/ResolutionRow/Resolution" unique_id=869386070]
+layout_mode = 0
+offset_left = 83.0
+offset_right = 115.0
+offset_bottom = 20.0
+
+[node name="BackToMenu" type="Button" parent="ColorRect/MarginContainer/VBoxContainer" unique_id=2062872061]
+layout_mode = 2
+text = "Back To Menu"

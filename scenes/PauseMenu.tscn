@@ -2,15 +2,16 @@
 
 [ext_resource type="Script" uid="uid://c5c3bmkxcr2b4" path="res://scripts/PauseMenu.cs" id="1_jvnd5"]
 [ext_resource type="FontFile" uid="uid://cnp0fwojltvh0" path="res://assets/fonts/m5x7.ttf" id="2_g4jo0"]
+[ext_resource type="PackedScene" uid="uid://768uhvuk1orr" path="res://scenes/SettingsMenu.tscn" id="3_komsw"]
 
-[node name="PauseMenu" type="CanvasLayer" unique_id=1032111199 node_paths=PackedStringArray("MenuRoot")]
+[node name="PauseMenu" type="CanvasLayer" unique_id=1032111199 node_paths=PackedStringArray("MenuRoot", "SettingsMenuNode")]
 process_mode = 3
 layer = 10
 script = ExtResource("1_jvnd5")
 MenuRoot = NodePath("MenuRoot")
+SettingsMenuNode = NodePath("SettingsMenu")
 
 [node name="MenuRoot" type="ColorRect" parent="." unique_id=1426683207]
-visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -49,6 +50,10 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("2_g4jo0")
 text = "Quit Game"
 
+[node name="SettingsMenu" parent="." unique_id=1599266557 instance=ExtResource("3_komsw")]
+visible = false
+
 [connection signal="pressed" from="MenuRoot/VBoxContainer/ResumeButton" to="." method="OnResumeButtonPressed"]
 [connection signal="pressed" from="MenuRoot/VBoxContainer/SaveButton" to="." method="OnSaveButtonPressed"]
+[connection signal="pressed" from="MenuRoot/VBoxContainer/SettingsButton" to="." method="OnSettingsButtonPressed"]
 [connection signal="pressed" from="MenuRoot/VBoxContainer/QuitButton" to="." method="OnQuitButtonPressed"]

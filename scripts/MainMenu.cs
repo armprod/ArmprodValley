@@ -3,33 +3,30 @@ using System;
 
 public partial class MainMenu : Control
 {
-	// Cesta k hlavní scéně tvé hry
 	[Export] public string GameScenePath = "res://scenes/Main.tscn";
 	
-	private Control _settingsPanel;
+	// Místo GetNode použijeme Export - pak jen uzel přetáhneš v Inspektoru
+	[Export] public Control SettingsMenuNode;
 
 	public override void _Ready()
 	{
-		var newGameBtn = GetNode<Button>("VBoxContainer/NewGameButton");
-		var loadGameBtn = GetNode<Button>("VBoxContainer/LoadGameButton");
-		var settingsBtn = GetNode<Button>("VBoxContainer/SettingsButton");
-		var quitBtn = GetNode<Button>("VBoxContainer/QuitButton");
-
-		// 2. Propojíme signály pomocí C# eventů (+=)
-		newGameBtn.Pressed += OnNewGamePressed;
-		loadGameBtn.Pressed += OnLoadGamePressed;
-		settingsBtn.Pressed += OnSettingsPressed;
-		quitBtn.Pressed += OnQuitPressed;
+		// Tlačítka v menu - ujisti se, že cesty v GetNode sedí s tvým VBoxem!
+		GetNode<Button>("VBoxContainer/NewGameButton").Pressed += OnNewGamePressed;
+		GetNode<Button>("VBoxContainer/LoadGameButton").Pressed += OnLoadGamePressed;
+		GetNode<Button>("VBoxContainer/SettingsButton").Pressed += OnSettingsPressed;
+		GetNode<Button>("VBoxContainer/QuitButton").Pressed += OnQuitPressed;
 		
-		GD.Print("Menu inicializováno a tlačítka propojena.");
+		// Schováme settings při startu, pokud jsou přiřazeny
+		if (SettingsMenuNode != null)
+		{
+			SettingsMenuNode.Hide();
+		}
 		
-		_settingsPanel = GetNode<Control>("SettingsPanel");
-		GetNode<Button>("SettingsPanel/CloseSettingsButton").Pressed += () => _settingsPanel.Hide();
+		GD.Print("MainMenu inicializováno.");
 	}
 
 	private void OnNewGamePressed()
 	{
-		GD.Print("Startuji novou hru...");
 		GetTree().ChangeSceneToFile(GameScenePath);
 	}
 
@@ -37,19 +34,25 @@ public partial class MainMenu : Control
 	{
 		if (FileAccess.FileExists("user://savegame.save"))
 		{
-			SaveManager.Instance.IsLoadingQueued = true;
-			GetTree().ChangeSceneToFile(GameScenePath);
-		}
-		else
-		{
-			GD.Print("Save nenalezen!");
+			// Pozor: Ujisti se, že tvůj SaveManager je v projektu jako Autoload!
+			if (SaveManager.Instance != null)
+			{
+				SaveManager.Instance.IsLoadingQueued = true;
+				GetTree().ChangeSceneToFile(GameScenePath);
+			}
 		}
 	}
 
 	private void OnSettingsPressed()
 	{
-		GD.Print("Otevírám nastavení...");
-		_settingsPanel.Show();
+		if (SettingsMenuNode != null)
+		{
+			SettingsMenuNode.Show();
+		}
+		else
+		{
+			GD.PrintErr("Chyba: SettingsMenuNode není přiřazeno v Inspektoru MainMenu!");
+		}
 	}
 
 	private void OnQuitPressed()
