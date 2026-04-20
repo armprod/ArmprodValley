@@ -6,6 +6,7 @@ public partial class SettingsMenu : Control
 {
 	[Export] public HSlider VolumeSlider;
 	[Export] public OptionButton ResOption;
+	[Signal] public delegate void ClosedEventHandler();
 
 	private List<Vector2I> resolutions = new List<Vector2I>
 	{
@@ -45,8 +46,10 @@ public partial class SettingsMenu : Control
 		DisplayServer.WindowSetPosition(screenSize / 2 - selectedRes / 2);
 	}
 
-	public void OnBackButtonPressed()
+	public void OnBackToMenuPressed()
 	{
-		this.Hide(); // Jen schováme okno settings
+		this.Hide();
+		EmitSignal(SignalName.Closed);
 	}
+	
 }

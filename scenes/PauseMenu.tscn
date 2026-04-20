@@ -57,3 +57,4 @@ visible = false
 [connection signal="pressed" from="MenuRoot/VBoxContainer/SaveButton" to="." method="OnSaveButtonPressed"]
 [connection signal="pressed" from="MenuRoot/VBoxContainer/SettingsButton" to="." method="OnSettingsButtonPressed"]
 [connection signal="pressed" from="MenuRoot/VBoxContainer/QuitButton" to="." method="OnQuitButtonPressed"]
+[connection signal="Closed" from="SettingsMenu" to="." method="OnSettingsMenuClosed"]

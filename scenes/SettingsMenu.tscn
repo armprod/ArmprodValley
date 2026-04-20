@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://768uhvuk1orr"]
 
 [ext_resource type="Script" uid="uid://l53ed8uu6a8s" path="res://scripts/SettingsMenu.cs" id="1_yelko"]
+[ext_resource type="FontFile" uid="uid://cnp0fwojltvh0" path="res://assets/fonts/m5x7.ttf" id="2_1yw23"]
 
 [node name="SettingsMenu" type="Control" unique_id=1599266557 node_paths=PackedStringArray("VolumeSlider", "ResOption")]
+process_mode = 3
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_yelko")
@@ -10,31 +12,37 @@ VolumeSlider = NodePath("ColorRect/MarginContainer/VBoxContainer/HSeparator/Volu
 ResOption = NodePath("ColorRect/MarginContainer/VBoxContainer/HSeparator/ResolutionRow/Resolution/ResolutionOptionButton")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=704843060]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0, 0, 0, 0.19607843)
-metadata/_edit_group_ = true
 
 [node name="MarginContainer" type="MarginContainer" parent="ColorRect" unique_id=1677324936]
 layout_mode = 1
-anchors_preset = 3
+anchors_preset = -1
 anchor_left = 1.0
-anchor_top = 1.0
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 1195.0
-offset_top = 294.0
-offset_right = 1595.0
-offset_bottom = 694.0
+offset_left = -620.0
+offset_top = 239.0
+offset_right = -546.0
+offset_bottom = 274.0
 grow_horizontal = 0
-grow_vertical = 0
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/MarginContainer" unique_id=2085812383]
 layout_mode = 2
+theme_override_constants/separation = 5
 
 [node name="Label" type="Label" parent="ColorRect/MarginContainer/VBoxContainer" unique_id=254166298]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_font_sizes/font_size = 32
 text = "Setting"
 
 [node name="HSeparator" type="HSeparator" parent="ColorRect/MarginContainer/VBoxContainer" unique_id=1627222930]
@@ -47,13 +55,16 @@ offset_bottom = 40.0
 
 [node name="Volume" type="Label" parent="ColorRect/MarginContainer/VBoxContainer/HSeparator/VolumeRow" unique_id=489825939]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_font_sizes/font_size = 32
 text = "Volume"
 
 [node name="VolumeSlider" type="HSlider" parent="ColorRect/MarginContainer/VBoxContainer/HSeparator/VolumeRow/Volume" unique_id=558025485]
 layout_mode = 0
-offset_left = 83.0
-offset_right = 91.0
-offset_bottom = 16.0
+offset_left = 81.0
+offset_top = 8.0
+offset_right = 389.0
+offset_bottom = 24.0
 
 [node name="ResolutionRow" type="HBoxContainer" parent="ColorRect/MarginContainer/VBoxContainer/HSeparator" unique_id=1537591576]
 layout_mode = 0
@@ -63,14 +74,32 @@ offset_bottom = 80.0
 
 [node name="Resolution" type="Label" parent="ColorRect/MarginContainer/VBoxContainer/HSeparator/ResolutionRow" unique_id=269476040]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_font_sizes/font_size = 32
 text = "Resolution"
 
 [node name="ResolutionOptionButton" type="OptionButton" parent="ColorRect/MarginContainer/VBoxContainer/HSeparator/ResolutionRow/Resolution" unique_id=869386070]
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 0
-offset_left = 83.0
-offset_right = 115.0
-offset_bottom = 20.0
+offset_left = 283.0
+offset_top = 5.0
+offset_right = 383.0
+offset_bottom = 25.0
 
-[node name="BackToMenu" type="Button" parent="ColorRect/MarginContainer/VBoxContainer" unique_id=2062872061]
-layout_mode = 2
+[node name="HBoxContainer" type="HBoxContainer" parent="ColorRect/MarginContainer/VBoxContainer/HSeparator" unique_id=23208909]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="BackToMenu" type="Button" parent="ColorRect/MarginContainer/VBoxContainer/HSeparator" unique_id=2062872061]
+layout_mode = 0
+offset_top = 100.0
+offset_right = 400.0
+offset_bottom = 131.0
+size_flags_vertical = 0
+theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_font_sizes/font_size = 32
 text = "Back To Menu"
+
+[connection signal="Closed" from="." to="." method="OnSettingsMenuClosed"]
+[connection signal="pressed" from="ColorRect/MarginContainer/VBoxContainer/HSeparator/BackToMenu" to="." method="OnBackToMenuPressed"]

@@ -93,20 +93,25 @@ public partial class PauseMenu : CanvasLayer
 	
 	public void OnSettingsButtonPressed()
 	{
-		GD.Print("1. Kliknuto na Settings!");
+		GD.Print("Otevírám settings...");
+		MenuRoot.Hide();
+		SettingsMenuNode.Show();
+	}
+	
+	public void OnSettingsMenuClosed()
+	{
+		GD.Print("Signál zachycen: Vracím se ze Settings do Pause Menu!");
 
-		if (MenuRoot == null || SettingsMenuNode == null)
+		if (SettingsMenuNode != null)
 		{
-			GD.PrintErr("2. CHYBA: MenuRoot nebo SettingsMenuNode není propojen v Inspektoru!");
-			return;
+			SettingsMenuNode.Hide();
 		}
 
-		GD.Print("3. Schovávám MenuRoot a zapínám Settings...");
-		
-		MenuRoot.Hide(); 
-		SettingsMenuNode.Show();
-		
-		GD.Print("4. Hotovo. MenuRoot visible: " + MenuRoot.Visible + " | Settings visible: " + SettingsMenuNode.Visible);
+		if (MenuRoot != null)
+		{
+			MenuRoot.Show();
+			MenuRoot.MouseFilter = Control.MouseFilterEnum.Stop;
+		}
 	}
 
 	public void OnQuitButtonPressed()

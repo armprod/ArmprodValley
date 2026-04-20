@@ -64,3 +64,5 @@ text = "Quit Game"
 
 [node name="SettingsMenu" parent="." unique_id=1599266557 instance=ExtResource("4_ow34m")]
 layout_mode = 0
+
+[connection signal="pressed" from="VBoxContainer/SettingsButton" to="." method="OnSettingsButtonPressed"]
