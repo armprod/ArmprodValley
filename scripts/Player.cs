@@ -38,11 +38,11 @@ public partial class Player : CharacterBody2D
 
 		if (SaveManager.Instance != null && SaveManager.Instance.IsLoadingQueued)
 		{
-			SaveData data = SaveManager.Instance.LoadGame(); // Tady nesmí být 'this'
+			var data = SaveManager.Instance.LoadGame(SaveManager.Instance.SelectedSlot);
 			if (data != null) 
 			{
-				this.GlobalPosition = data.PlayerPosition;
-				this.Money = data.Money; // Tohle teď bude fungovat díky opravě v bodě 1
+				GlobalPosition = new Vector2(0, -500);
+				this.Money = data.Money;
 			}
 		}
 	}

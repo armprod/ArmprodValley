@@ -4,19 +4,22 @@ using System;
 public partial class MainMenu : Control
 {
 	[Export] public string GameScenePath = "res://scenes/Main.tscn";
+	[Export] public string LoadMenuScenePath = "res://scenes/LoadGameMenu.tscn";
 	
-	// Místo GetNode použijeme Export - pak jen uzel přetáhneš v Inspektoru
 	[Export] public Control SettingsMenuNode;
+	
+	[Export] public Button NewGameButton;
+	[Export] public Button LoadGameButton;
+	[Export] public Button SettingsButton;
+	[Export] public Button QuitButton;
 
 	public override void _Ready()
 	{
-		// Tlačítka v menu - ujisti se, že cesty v GetNode sedí s tvým VBoxem!
-		GetNode<Button>("VBoxContainer/NewGameButton").Pressed += OnNewGamePressed;
-		GetNode<Button>("VBoxContainer/LoadGameButton").Pressed += OnLoadGamePressed;
-		GetNode<Button>("VBoxContainer/SettingsButton").Pressed += OnSettingsPressed;
-		GetNode<Button>("VBoxContainer/QuitButton").Pressed += OnQuitPressed;
+		if (NewGameButton != null) NewGameButton.Pressed += OnNewGamePressed;
+		if (LoadGameButton != null) LoadGameButton.Pressed += OnLoadGamePressed;
+		if (SettingsButton != null) SettingsButton.Pressed += OnSettingsPressed;
+		if (QuitButton != null) QuitButton.Pressed += OnQuitPressed;
 		
-		// Schováme settings při startu, pokud jsou přiřazeny
 		if (SettingsMenuNode != null)
 		{
 			SettingsMenuNode.Hide();
@@ -27,19 +30,28 @@ public partial class MainMenu : Control
 
 	private void OnNewGamePressed()
 	{
+		if (SaveManager.Instance != null)
+		{
+			// Najde první číslo, které ještě neexistuje (např. save_3.json)
+			int freeSlot = SaveManager.Instance.GetNextFreeSlot();
+			SaveManager.Instance.SelectedSlot = freeSlot; 
+			SaveManager.Instance.IsLoadingQueued = false;
+			
+			GD.Print($"Startujeme novou hru ve slotu: {freeSlot}");
+		}
 		GetTree().ChangeSceneToFile(GameScenePath);
 	}
 
 	private void OnLoadGamePressed()
 	{
-		if (FileAccess.FileExists("user://savegame.save"))
+		// Místo kontroly jednoho souboru prostě přepneme do menu slotů
+		if (ResourceLoader.Exists(LoadMenuScenePath))
 		{
-			// Pozor: Ujisti se, že tvůj SaveManager je v projektu jako Autoload!
-			if (SaveManager.Instance != null)
-			{
-				SaveManager.Instance.IsLoadingQueued = true;
-				GetTree().ChangeSceneToFile(GameScenePath);
-			}
+			GetTree().ChangeSceneToFile(LoadMenuScenePath);
+		}
+		else
+		{
+			GD.PrintErr("Chyba: Scéna pro Load Menu nebyla nalezena na: " + LoadMenuScenePath);
 		}
 	}
 
@@ -48,10 +60,6 @@ public partial class MainMenu : Control
 		if (SettingsMenuNode != null)
 		{
 			SettingsMenuNode.Show();
-		}
-		else
-		{
-			GD.PrintErr("Chyba: SettingsMenuNode není přiřazeno v Inspektoru MainMenu!");
 		}
 	}
 

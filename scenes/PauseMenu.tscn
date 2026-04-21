@@ -4,12 +4,13 @@
 [ext_resource type="FontFile" uid="uid://cnp0fwojltvh0" path="res://assets/fonts/m5x7.ttf" id="2_g4jo0"]
 [ext_resource type="PackedScene" uid="uid://768uhvuk1orr" path="res://scenes/SettingsMenu.tscn" id="3_komsw"]
 
-[node name="PauseMenu" type="CanvasLayer" unique_id=1032111199 node_paths=PackedStringArray("MenuRoot", "SettingsMenuNode")]
+[node name="PauseMenu" type="CanvasLayer" unique_id=1032111199 node_paths=PackedStringArray("MenuRoot", "SettingsMenuNode", "SaveNameInput")]
 process_mode = 3
 layer = 10
 script = ExtResource("1_jvnd5")
 MenuRoot = NodePath("MenuRoot")
 SettingsMenuNode = NodePath("SettingsMenu")
+SaveNameInput = NodePath("MenuRoot/VBoxContainer/SaveName")
 
 [node name="MenuRoot" type="ColorRect" parent="." unique_id=1426683207]
 anchors_preset = 15
@@ -21,14 +22,14 @@ color = Color(0, 0, 0, 0.19607843)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MenuRoot" unique_id=988757903]
 layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_top = -48.0
 offset_right = 77.0
-offset_bottom = 48.0
-grow_vertical = 2
+offset_bottom = 131.0
 scale = Vector2(5, 5)
+
+[node name="SaveName" type="LineEdit" parent="MenuRoot/VBoxContainer" unique_id=40701778]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_g4jo0")
+placeholder_text = "Set Name"
 
 [node name="ResumeButton" type="Button" parent="MenuRoot/VBoxContainer" unique_id=1154816414]
 layout_mode = 2

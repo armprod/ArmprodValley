@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://dkhbggcvyoldy"]
+
+[ext_resource type="Script" uid="uid://bh0n5811ofkui" path="res://scripts/SaveSlot.cs" id="1_41ent"]
+
+[node name="SaveSlot" type="Button" unique_id=1571092284 node_paths=PackedStringArray("TitleLabel", "DeleteButton", "RenameInput", "RenameButton")]
+custom_minimum_size = Vector2(400, 80)
+script = ExtResource("1_41ent")
+TitleLabel = NodePath("HBoxContainer/TitleLabel")
+DeleteButton = NodePath("HBoxContainer/DeleteButton")
+RenameInput = NodePath("HBoxContainer/RenameInput")
+RenameButton = NodePath("HBoxContainer/RenameButton")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1848644766]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TitleLabel" type="Label" parent="HBoxContainer" unique_id=1357190683]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="HBoxContainer" unique_id=937949076]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RenameInput" type="LineEdit" parent="HBoxContainer" unique_id=2053385794]
+visible = false
+layout_mode = 2
+
+[node name="RenameButton" type="Button" parent="HBoxContainer" unique_id=1671623222]
+layout_mode = 2
+text = "R"
+
+[node name="DeleteButton" type="Button" parent="HBoxContainer" unique_id=12709705]
+layout_mode = 2
+text = "X"

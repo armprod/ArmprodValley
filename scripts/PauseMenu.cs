@@ -5,6 +5,7 @@ public partial class PauseMenu : CanvasLayer
 {
 	[Export] public Control MenuRoot;
 	[Export] public Control SettingsMenuNode;
+	[Export] public LineEdit SaveNameInput;
 
 	public override void _Ready()
 	{
@@ -66,6 +67,15 @@ public partial class PauseMenu : CanvasLayer
 		GD.Print("Pokus o uložení...");
 		SaveData data = new SaveData();
 
+		// --- NOVINKA: Získání názvu ---
+		if (SaveNameInput != null)
+		{
+			string name = SaveNameInput.Text.Trim();
+			// Pokud je políčko prázdné, dáme automatický název
+			data.SaveName = string.IsNullOrEmpty(name) ? $"Uloženo {DateTime.Now:HH:mm}" : name;
+		}
+		// ------------------------------
+
 		var playerNode = GetTree().CurrentScene.FindChild("Player", true, false) as Player;
 		if (playerNode != null)
 		{
@@ -82,8 +92,11 @@ public partial class PauseMenu : CanvasLayer
 
 		if (SaveManager.Instance != null)
 		{
-			SaveManager.Instance.SaveGame(data);
-			GD.Print("HRA ÚSPĚŠNĚ ULOŽENA");
+			SaveManager.Instance.SaveGame(data, SaveManager.Instance.SelectedSlot);
+			GD.Print($"HRA ÚSPĚŠNĚ ULOŽENA pod názvem: {data.SaveName}");
+			
+			// Po uložení políčko vymažeme, aby bylo čisté pro příště
+			if (SaveNameInput != null) SaveNameInput.Text = "";
 		}
 		else
 		{

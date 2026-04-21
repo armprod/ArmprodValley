@@ -12,7 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://c2gqhqvg01stg" path="res://assets/character/character_tool_pickaxe_animations_sprite.png" id="9_d2wvv"]
 [ext_resource type="Texture2D" uid="uid://destyuacwa5lf" path="res://assets/character/character_tool_scythe_animations_sprite.png" id="10_3v2ag"]
 [ext_resource type="Script" uid="uid://ccbegvkb1a4k0" path="res://scripts/FishingSystem.cs" id="12_3v2ag"]
-[ext_resource type="PackedScene" uid="uid://cjtys1bjgh2yo" path="res://scenes/fish_bar.tscn" id="13_jej6c"]
+[ext_resource type="PackedScene" uid="uid://cjtys1bjgh2yo" path="res://scenes/FishBar.tscn" id="13_jej6c"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
 size = Vector2(14.4, 16)

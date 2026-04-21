@@ -6,7 +6,11 @@
 [node name="SettingsMenu" type="Control" unique_id=1599266557 node_paths=PackedStringArray("VolumeSlider", "ResOption")]
 process_mode = 3
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_yelko")
 VolumeSlider = NodePath("ColorRect/MarginContainer/VBoxContainer/HSeparator/VolumeRow/Volume/VolumeSlider")
 ResOption = NodePath("ColorRect/MarginContainer/VBoxContainer/HSeparator/ResolutionRow/Resolution/ResolutionOptionButton")
@@ -16,22 +20,19 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 1920.0
-offset_bottom = 1080.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.19607843)
 
 [node name="MarginContainer" type="MarginContainer" parent="ColorRect" unique_id=1677324936]
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -620.0
-offset_top = 239.0
-offset_right = -546.0
-offset_bottom = 274.0
-grow_horizontal = 0
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -37.0
+offset_right = 37.0
+offset_bottom = 35.0
+grow_horizontal = 2
 theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 0
 

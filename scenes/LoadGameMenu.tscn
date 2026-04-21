@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://bb6gg1nd3vqub"]
+
+[ext_resource type="Script" uid="uid://cwvl6glfxvlwu" path="res://scripts/LoadGameMenu.cs" id="1_hvu63"]
+[ext_resource type="PackedScene" uid="uid://dkhbggcvyoldy" path="res://scenes/SaveSlot.tscn" id="2_o83qx"]
+[ext_resource type="Texture2D" uid="uid://cd5hksjvvbblb" path="res://assets/other/3.png" id="3_37b5w"]
+[ext_resource type="FontFile" uid="uid://cnp0fwojltvh0" path="res://assets/fonts/m5x7.ttf" id="3_x1pjc"]
+
+[node name="LoadGameMenu" type="Control" unique_id=765194722 node_paths=PackedStringArray("SlotContainer", "BackButton")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hvu63")
+SaveSlotScene = ExtResource("2_o83qx")
+SlotContainer = NodePath("CenterContainer/VBoxContainer2/VBoxContainer")
+BackButton = NodePath("CenterContainer/VBoxContainer2/BackToMenu")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=232721959]
+layout_mode = 0
+offset_left = -21.0
+offset_top = -42.0
+offset_right = 979.0
+offset_bottom = 521.0
+scale = Vector2(1.9935367, 1.9935367)
+texture = ExtResource("3_37b5w")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1947279448]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.19607843)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1204160397]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="CenterContainer" unique_id=834543983]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer2" unique_id=677540646]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BackToMenu" type="Button" parent="CenterContainer/VBoxContainer2" unique_id=2134686782]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_x1pjc")
+theme_override_font_sizes/font_size = 32
+text = "Back To Menu"
