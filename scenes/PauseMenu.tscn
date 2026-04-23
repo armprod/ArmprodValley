@@ -46,6 +46,13 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("2_g4jo0")
 text = "Settings"
 
+[node name="MenuButton" type="Button" parent="MenuRoot/VBoxContainer" unique_id=26922006]
+process_mode = 3
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_g4jo0")
+theme_override_font_sizes/font_size = 16
+text = "Back To Menu"
+
 [node name="QuitButton" type="Button" parent="MenuRoot/VBoxContainer" unique_id=719984261]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_g4jo0")
@@ -57,5 +64,6 @@ visible = false
 [connection signal="pressed" from="MenuRoot/VBoxContainer/ResumeButton" to="." method="OnResumeButtonPressed"]
 [connection signal="pressed" from="MenuRoot/VBoxContainer/SaveButton" to="." method="OnSaveButtonPressed"]
 [connection signal="pressed" from="MenuRoot/VBoxContainer/SettingsButton" to="." method="OnSettingsButtonPressed"]
+[connection signal="pressed" from="MenuRoot/VBoxContainer/MenuButton" to="." method="OnMenuButtonPressed"]
 [connection signal="pressed" from="MenuRoot/VBoxContainer/QuitButton" to="." method="OnQuitButtonPressed"]
 [connection signal="Closed" from="SettingsMenu" to="." method="OnSettingsMenuClosed"]

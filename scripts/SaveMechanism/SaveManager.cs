@@ -6,108 +6,135 @@ using System.Collections.Generic;
 public partial class SaveManager : Node
 {
 	public static SaveManager Instance { get; private set; }
-	
-	// Místo jednoho souboru definujeme složku
 	private string _saveFolder = "user://saves/";
+	
+	public TileMapLayer FarmingLayerNode { get; set; }
+	public TileMapLayer PlantsLayerNode { get; set; }
 
 	public bool IsLoadingQueued { get; set; } = false;
-
-	// Pomocná proměnná pro uchování vybraného slotu při přechodu mezi scénami
 	public int SelectedSlot { get; set; } = 1;
+
+	// Nastavení pro JSON, aby správně ukládal Vector2I a další data
+	private JsonSerializerOptions _jsonOptions = new JsonSerializerOptions { IncludeFields = true, WriteIndented = true };
 
 	public override void _Ready()
 	{
 		Instance = this;
-		
-		// Vytvoříme složku pro savy, pokud neexistuje
 		if (!DirAccess.DirExistsAbsolute(_saveFolder))
-		{
-			DirAccess.MakeDirRecursiveAbsolute(_saveFolder);
-		}
+			DirAccess.MakeDirRecursiveAbsolute(_saveFolder);			
 	}
 
-	// Pomocná funkce pro sestavení cesty k souboru podle ID slotu
-	private string GetSavePath(int id)
-	{
-		return $"{_saveFolder}save_{id}.json";
-	}
-	
+	public string GetSavePath(int id) => $"{_saveFolder}save_{id}.json";
+	public bool DoesSaveExist(int id) => FileAccess.FileExists(GetSavePath(id));
+
 	public int GetNextFreeSlot()
 	{
 		int id = 1;
-		while (DoesSaveExist(id))
-		{
-			id++;
-		}
+		while (DoesSaveExist(id)) id++;
 		return id;
 	}
 
-	// Upravené ukládání s parametrem ID
 	public void SaveGame(SaveData data, int id)
 	{
-		try 
-		{
-			// Do dat přidáme aktuální čas a název, aby to UI mohlo zobrazit
-			data.Date = DateTime.Now.ToString("dd.MM.yyyy HH:mm");
-			
-			string jsonString = JsonSerializer.Serialize(data);
-			string path = GetSavePath(id);
+		GD.Print($"--- POKUS O ULOŽENÍ (Slot {id}) ---");
 
-			using var file = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Write);
-			if (file != null)
+		// KONTROLA 1: Máme propojený uzel?
+		if (FarmingLayerNode == null)
+		{
+			FarmingLayerNode = GetTree().Root.FindChild("FarmingLayer", true, false) as TileMapLayer;
+		}
+
+		if (FarmingLayerNode != null)
+		{
+			data.FarmTiles.Clear();
+			var cells = FarmingLayerNode.GetUsedCells();
+			GD.Print($"Nalezeno políček k uložení: {cells.Count}");
+
+			foreach (Vector2I cell in cells)
 			{
-				file.StoreString(jsonString);
-				GD.Print($"Hra uložena do slotu {id} na cestu: {path}");
+				TileSaveData tData = new TileSaveData {
+					Pos = cell,
+					GroundAtlasPos = FarmingLayerNode.GetCellAtlasCoords(cell)
+				};
+
+				// KONTROLA 2: Máme rostliny?
+				if (PlantsLayerNode != null && PlantsLayerNode.GetCellSourceId(cell) != -1)
+				{
+					tData.HasPlant = true;
+					tData.PlantAtlasPos = PlantsLayerNode.GetCellAtlasCoords(cell);
+				}
+				data.FarmTiles.Add(tData);
 			}
 		}
-		catch (Exception e)
+		else
 		{
-			GD.PrintErr("Chyba při ukládání: " + e.Message);
+			GD.PrintErr("KRITICKÁ CHYBA: FarmingLayerNode nebyl nalezen ani po záchranném pokusu!");
 		}
+
+		// Uložení do JSONu (nezapomeň na ty Options, jinak Vector2I nebude fungovat!)
+		var options = new JsonSerializerOptions { IncludeFields = true, WriteIndented = true };
+		string jsonString = JsonSerializer.Serialize(data, options);
+		using var file = FileAccess.Open(GetSavePath(id), FileAccess.ModeFlags.Write);
+		if (file != null) file.StoreString(jsonString);
+		
+		GD.Print("--- KONEC UKLÁDÁNÍ ---");
 	}
 
-	// Upravené načítání – teď už ID skutečně používá
 	public SaveData LoadGame(int id) 
 	{
 		string path = GetSavePath(id);
-
-		if (!Godot.FileAccess.FileExists(path)) 
+		if (!FileAccess.FileExists(path)) 
 		{
-			GD.Print($"Save ve slotu {id} neexistuje.");
 			return null;
 		}
 
-		using var file = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Read);
-		string jsonString = file.GetAsText();
-		
-		return JsonSerializer.Deserialize<SaveData>(jsonString);
+		using var file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
+		string jsonText = file.GetAsText();
+		SaveData data = JsonSerializer.Deserialize<SaveData>(jsonText, _jsonOptions);
+
+		if (data == null)
+		{
+			GD.PrintErr("CHYBA: Nepodařilo se přeložit JSON (data jsou null)!");
+			return null;
+		}
+
+		if (FarmingLayerNode == null)
+		{
+			return data; 
+		}
+
+		// Pokud jsme došli sem, začneme kreslit
+		FarmingLayerNode.Clear();
+		PlantsLayerNode?.Clear();
+
+		foreach (var tile in data.FarmTiles)
+		{
+			// Změň tu 1 na 0, pokud se stále nic neobjevuje!
+			FarmingLayerNode.SetCell(tile.Pos, 0, tile.GroundAtlasPos);
+			
+			if (tile.HasPlant)
+			{
+				PlantsLayerNode?.SetCell(tile.Pos, 0, tile.PlantAtlasPos);
+			}
+		}
+
+		GD.Print($"ÚSPĚCH: Načteno {data.FarmTiles.Count} políček z disku.");
+		return data;
 	}
 
-	// Funkce pro UI: Zjistí, jestli slot existuje
-	public bool DoesSaveExist(int id)
-	{
-		return Godot.FileAccess.FileExists(GetSavePath(id));
-	}
-	
 	public void RenameSave(int slotId, string newName)
 	{
 		SaveData data = LoadGame(slotId);
 		if (data != null)
 		{
 			data.SaveName = newName;
-			// Tady byla ta chyba - ujisti se, že ID je první!
 			SaveGame(data, slotId); 
 		}
 	}
-	
+
 	public void DeleteSave(int id)
 	{
 		string path = GetSavePath(id);
-		if (Godot.FileAccess.FileExists(path))
-		{
-			// DirAccess umí mazat soubory přes Remove
-			DirAccess.RemoveAbsolute(path);
-			GD.Print($"Save {id} byl smazán.");
-		}
+		if (FileAccess.FileExists(path)) DirAccess.RemoveAbsolute(path);
 	}
 }

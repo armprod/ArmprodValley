@@ -126,6 +126,37 @@ public partial class PauseMenu : CanvasLayer
 			MenuRoot.MouseFilter = Control.MouseFilterEnum.Stop;
 		}
 	}
+	
+	public void OnMenuButtonPressed()
+	{
+		GD.Print("Tlačítko menu stisknuto - startuji návrat...");
+
+		// Pokud je GetTree().Paused = true, nová scéna se sice načte,
+		// ale zůstane zamrzlá pod tou starou.
+		Engine.TimeScale = 1.0f; 
+		GetTree().Paused = false;
+
+		// 2. Vyčistíme SaveManager
+		if (SaveManager.Instance != null)
+		{
+			SaveManager.Instance.FarmingLayerNode = null;
+			SaveManager.Instance.PlantsLayerNode = null;
+		}
+		
+		this.Hide();
+		
+		// Použijeme metodu, která scénu úplně vymaže a nahradí
+		var scenePath = "res://scenes/MainMenu.tscn"; // Zkontroluj tuhle cestu v souborech!
+		
+		if (ResourceLoader.Exists(scenePath))
+		{
+			GetTree().ChangeSceneToFile(scenePath);
+		}
+		else
+		{
+			GD.PrintErr("CHYBA: Soubor MainMenu.tscn nebyl na cestě nalezen!");
+		}
+	}
 
 	public void OnQuitButtonPressed()
 	{

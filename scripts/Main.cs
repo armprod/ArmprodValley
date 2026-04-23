@@ -5,6 +5,21 @@ public partial class Main : Node2D
 {
 	[Export] public TileMapLayer FarmLayer; // Přetáhni svůj TileMapLayer do inspektoru
 
+	public override void _Ready()
+	{
+		if (SaveManager.Instance != null)
+		{
+			// 1. NEJDŘÍV propojíme uzly
+			SaveManager.Instance.FarmingLayerNode = GetNodeOrNull<TileMapLayer>("FarmingLayer");
+			SaveManager.Instance.PlantsLayerNode = GetNodeOrNull<TileMapLayer>("PlantsLayer");
+			GD.Print("ÚSPĚCH: FarmingLayer propojen z Main.cs");
+
+			// 2. TEPRVE TEĎ načteme hru pro aktuální slot
+			int slotId = SaveManager.Instance.SelectedSlot; 
+			SaveManager.Instance.LoadGame(slotId);
+		}
+	}
+
 	public override void _Input(InputEvent @event)
 	{
 		// Kontrola, zda hráč klikl levým tlačítkem myši
