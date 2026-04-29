@@ -83,16 +83,13 @@ public partial class Player : CharacterBody2D
 
 		if (@event.IsActionPressed("action_use"))
 		{	
-			// 1. PŘEDNOST MÁ RYBAŘENÍ
-			// Pokud máš v ruce prut (suffix je _rod)
+			// 1. PŘEDNOST MÁ RYBAŘENÍ před ostatními nástroji
 			if (_currentToolSuffix == "_rod" && _fishing != null)
 			{
 				_fishing.HandleInput();
-				// Tady můžeme přidat 'return', aby se zbytek metody už neřešil
 				return; 
 			}
 			
-			// 2. OSTATNÍ NÁSTROJE (spustí se jen, když nemáš prut)
 			if (!string.IsNullOrEmpty(_currentToolSuffix))
 			{
 				PlayToolAnimation();
@@ -102,20 +99,19 @@ public partial class Player : CharacterBody2D
 
 	private void HandleSlotInput(InputEvent @event)
 	{
-		// 1. Speciální případ pro Slot 7 (Prut) - ten musí fungovat vždy, aby šel prut i schovat
+		// Prut musí fungovat vždy aby se dal i vypnout
 		if (@event.IsActionPressed("slot_7")) 
 		{
 			ToggleFishing();
 			return;
 		}
 
-		// 2. ZÁMEK: Pokud už prut držíš, ignoruj všechny ostatní sloty (0-6, 8, 9)
+		// Ignoruje ostatní nástroje kdyyž držíme prut
 		if (_currentToolSuffix == "_rod") 
 		{
 			return; 
 		}
 
-		// 3. Normální přepínání nástrojů (stane se jen, když v ruce NENÍ prut)
 		if (@event.IsActionPressed("slot_0")) _currentToolSuffix = "_seed";
 		else if (@event.IsActionPressed("slot_1")) _currentToolSuffix = "_sword";
 		else if (@event.IsActionPressed("slot_2")) _currentToolSuffix = "_pickaxe";
@@ -123,15 +119,10 @@ public partial class Player : CharacterBody2D
 		else if (@event.IsActionPressed("slot_4")) _currentToolSuffix = "_hoe";
 		else if (@event.IsActionPressed("slot_5")) _currentToolSuffix = "_can";
 		else if (@event.IsActionPressed("slot_6")) _currentToolSuffix = "_scythe";
-		else if (@event.IsActionPressed("slot_8") || @event.IsActionPressed("slot_9")) 
-		{
-			_currentToolSuffix = "";
-		}
+		else if (@event.IsActionPressed("slot_8")) _currentToolSuffix = "_hammer";
+		else if (@event.IsActionPressed("slot_9")) _currentToolSuffix = "";
 	}
 
-	// --- KLÍČOVÉ OPRAVY PRO OSTATNÍ SKRIPTY ---
-
-	// Opravuje chybu v SaveManager a FarmingSystem
 	public void AddMoney(int amount) 
 	{ 
 		_money += amount; 
@@ -212,7 +203,7 @@ public partial class Player : CharacterBody2D
 			GD.Print("Schovávám prut.");
 		}
 		
-		// Okamžitě aktualizuj animaci, aby hráč nečekal na pohyb
+		// Okamžitá aktualizace animací
 		PlayIdleAnimation();
 	}
 

@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://bon48p2kwrl2l"]
 
-[ext_resource type="Script" uid="uid://chxngudm214bn" path="res://scripts/MainMenu.cs" id="1_0ykhv"]
-[ext_resource type="Texture2D" uid="uid://cd5hksjvvbblb" path="res://assets/other/3.png" id="1_yqorp"]
+[ext_resource type="Script" uid="uid://chxngudm214bn" path="res://scripts/MenuScenes/MainMenu.cs" id="1_0ykhv"]
+[ext_resource type="Texture2D" uid="uid://7fjxt7u4vl2s" path="res://assets/other/armprod_valley_lobby_picture_v2.png" id="2_ow34m"]
 [ext_resource type="FontFile" uid="uid://cnp0fwojltvh0" path="res://assets/fonts/m5x7.ttf" id="3_2wh52"]
-[ext_resource type="PackedScene" uid="uid://768uhvuk1orr" path="res://scenes/SettingsMenu.tscn" id="4_ow34m"]
+[ext_resource type="PackedScene" uid="uid://768uhvuk1orr" path="res://scenes/MenuScenes/SettingsMenu.tscn" id="4_ow34m"]
 
 [node name="MainMenu" type="Control" unique_id=594523750 node_paths=PackedStringArray("SettingsMenuNode", "NewGameButton", "LoadGameButton", "SettingsButton", "QuitButton")]
 layout_mode = 3
@@ -13,6 +13,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_0ykhv")
+LoadMenuScenePath = "res://scenes/MenuScenes/LoadGameMenu.tscn"
 SettingsMenuNode = NodePath("SettingsMenu")
 NewGameButton = NodePath("CenterContainer/VBoxContainer/NewGameButton")
 LoadGameButton = NodePath("CenterContainer/VBoxContainer/LoadGameButton")
@@ -20,17 +21,18 @@ SettingsButton = NodePath("CenterContainer/VBoxContainer/SettingsButton")
 QuitButton = NodePath("CenterContainer/VBoxContainer/QuitButton")
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=1774796383]
-layout_mode = 0
-offset_left = -21.0
-offset_top = -42.0
-offset_right = 979.0
-offset_bottom = 521.0
-scale = Vector2(1.9935367, 1.9935367)
-texture = ExtResource("1_yqorp")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1.0000612, 1.0000612)
+texture = ExtResource("2_ow34m")
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=1100781591]
 layout_mode = 1
-anchors_preset = -1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2

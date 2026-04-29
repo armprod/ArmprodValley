@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://in85dd45cg1j"]
 
-[ext_resource type="Script" uid="uid://c5c3bmkxcr2b4" path="res://scripts/PauseMenu.cs" id="1_jvnd5"]
+[ext_resource type="Script" uid="uid://c5c3bmkxcr2b4" path="res://scripts/MenuScenes/PauseMenu.cs" id="1_jvnd5"]
 [ext_resource type="FontFile" uid="uid://cnp0fwojltvh0" path="res://assets/fonts/m5x7.ttf" id="2_g4jo0"]
-[ext_resource type="PackedScene" uid="uid://768uhvuk1orr" path="res://scenes/SettingsMenu.tscn" id="3_komsw"]
+[ext_resource type="PackedScene" uid="uid://768uhvuk1orr" path="res://scenes/MenuScenes/SettingsMenu.tscn" id="3_komsw"]
 
 [node name="PauseMenu" type="CanvasLayer" unique_id=1032111199 node_paths=PackedStringArray("MenuRoot", "SettingsMenuNode", "SaveNameInput")]
 process_mode = 3

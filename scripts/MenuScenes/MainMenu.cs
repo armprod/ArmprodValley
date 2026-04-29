@@ -4,7 +4,7 @@ using System;
 public partial class MainMenu : Control
 {
 	[Export] public string GameScenePath = "res://scenes/Main.tscn";
-	[Export] public string LoadMenuScenePath = "res://scenes/LoadGameMenu.tscn";
+	[Export] public string LoadMenuScenePath = "res://scenes/MenuScenes/LoadGameMenu.tscn";
 	
 	[Export] public Control SettingsMenuNode;
 	

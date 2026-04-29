@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://bb6gg1nd3vqub"]
 
-[ext_resource type="Script" uid="uid://cwvl6glfxvlwu" path="res://scripts/LoadGameMenu.cs" id="1_hvu63"]
-[ext_resource type="PackedScene" uid="uid://dkhbggcvyoldy" path="res://scenes/SaveSlot.tscn" id="2_o83qx"]
-[ext_resource type="Texture2D" uid="uid://cd5hksjvvbblb" path="res://assets/other/3.png" id="3_37b5w"]
+[ext_resource type="Script" uid="uid://cwvl6glfxvlwu" path="res://scripts/MenuScenes/LoadGameMenu.cs" id="1_hvu63"]
+[ext_resource type="PackedScene" uid="uid://dkhbggcvyoldy" path="res://scenes/MenuScenes/SaveSlot.tscn" id="2_o83qx"]
+[ext_resource type="Texture2D" uid="uid://7fjxt7u4vl2s" path="res://assets/other/armprod_valley_lobby_picture_v2.png" id="3_37b5w"]
 [ext_resource type="FontFile" uid="uid://cnp0fwojltvh0" path="res://assets/fonts/m5x7.ttf" id="3_x1pjc"]
 
 [node name="LoadGameMenu" type="Control" unique_id=765194722 node_paths=PackedStringArray("SlotContainer", "BackButton")]
@@ -19,11 +19,8 @@ BackButton = NodePath("CenterContainer/VBoxContainer2/BackToMenu")
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=232721959]
 layout_mode = 0
-offset_left = -21.0
-offset_top = -42.0
-offset_right = 979.0
-offset_bottom = 521.0
-scale = Vector2(1.9935367, 1.9935367)
+offset_right = 1920.0
+offset_bottom = 1080.0
 texture = ExtResource("3_37b5w")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1947279448]

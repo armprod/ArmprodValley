@@ -66,6 +66,6 @@ public partial class LoadGameMenu : Control
 	public void OnBackButtonPressed()
 	{
 		// Vrátíme se do hlavního menu
-		GetTree().ChangeSceneToFile("res://scenes/MainMenu.tscn");
+		GetTree().ChangeSceneToFile("res://scenes/MenuScenes/MainMenu.tscn");
 	}
 }

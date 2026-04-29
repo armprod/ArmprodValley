@@ -146,7 +146,7 @@ public partial class PauseMenu : CanvasLayer
 		this.Hide();
 		
 		// Použijeme metodu, která scénu úplně vymaže a nahradí
-		var scenePath = "res://scenes/MainMenu.tscn"; // Zkontroluj tuhle cestu v souborech!
+		var scenePath = "res://scenes/MenuScenes/MainMenu.tscn"; // Zkontroluj tuhle cestu v souborech!
 		
 		if (ResourceLoader.Exists(scenePath))
 		{
