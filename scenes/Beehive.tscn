@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://cah1jnrhm063q"]
+
+[ext_resource type="Texture2D" uid="uid://22c5pa6sjl7c" path="res://assets/other/beehives.png" id="1_y4bkb"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bh25o"]
+atlas = ExtResource("1_y4bkb")
+region = Rect2(0, 16, 160, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_y4bkb"]
+size = Vector2(32, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bh25o"]
+
+[node name="Beehive" type="StaticBody2D" unique_id=804938009]
+z_index = 5
+y_sort_enabled = true
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1881276969]
+texture = SubResource("AtlasTexture_bh25o")
+hframes = 5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=437383951]
+shape = SubResource("RectangleShape2D_y4bkb")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=1998608685]
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=488121474]
+scale = Vector2(3, 3)
+shape = SubResource("RectangleShape2D_bh25o")
+
+[node name="GrowthTimer" type="Timer" parent="." unique_id=77474860]
+
+[node name="CollectIcon" type="Sprite2D" parent="." unique_id=1075792982]

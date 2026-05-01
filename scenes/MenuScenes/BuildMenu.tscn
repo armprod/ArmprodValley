@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://bdbkfdajdjdi2"]
+
+[ext_resource type="FontFile" uid="uid://cnp0fwojltvh0" path="res://assets/fonts/m5x7.ttf" id="1_vobwq"]
+[ext_resource type="Script" uid="uid://gb2hlywgd8kx" path="res://scripts/BuildingScripts/BuildMenu.cs" id="1_xldf8"]
+[ext_resource type="Texture2D" uid="uid://22c5pa6sjl7c" path="res://assets/other/beehives.png" id="2_t25fu"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xldf8"]
+atlas = ExtResource("2_t25fu")
+region = Rect2(0, 0, 16, 16)
+
+[node name="BuildMenu" type="CanvasLayer" unique_id=1543513687]
+script = ExtResource("1_xldf8")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=531380759]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.19607843)
+metadata/_edit_use_anchors_ = true
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=180586276]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuWindow" type="NinePatchRect" parent="CenterContainer" unique_id=618601354]
+custom_minimum_size = Vector2(400, 250)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/MenuWindow" unique_id=807503552]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/MenuWindow/MarginContainer" unique_id=1843100916]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/MenuWindow/MarginContainer/VBoxContainer" unique_id=275090882]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_vobwq")
+theme_override_font_sizes/font_size = 64
+text = "Building Menu"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/MenuWindow/MarginContainer/VBoxContainer" unique_id=121205549]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="CenterContainer/MenuWindow/MarginContainer/VBoxContainer/ScrollContainer" unique_id=525636980]
+layout_mode = 2
+columns = 3
+
+[node name="BeehiveButton" type="TextureButton" parent="CenterContainer/MenuWindow/MarginContainer/VBoxContainer/ScrollContainer/GridContainer" unique_id=2064744015]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/MenuWindow/MarginContainer/VBoxContainer/ScrollContainer/GridContainer/BeehiveButton" unique_id=317834169]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("AtlasTexture_xldf8")
+expand_mode = 1
+stretch_mode = 5
+
+[connection signal="BuildingSelected" from="." to="." method="OnBuildingSelected"]
+[connection signal="pressed" from="CenterContainer/MenuWindow/MarginContainer/VBoxContainer/ScrollContainer/GridContainer/BeehiveButton" to="." method="OnBeehiveButtonPressed"]
