@@ -13,7 +13,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_0ykhv")
-LoadMenuScenePath = "res://scenes/MenuScenes/LoadGameMenu.tscn"
 SettingsMenuNode = NodePath("SettingsMenu")
 NewGameButton = NodePath("CenterContainer/VBoxContainer/NewGameButton")
 LoadGameButton = NodePath("CenterContainer/VBoxContainer/LoadGameButton")

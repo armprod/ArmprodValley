@@ -7365,6 +7365,8 @@ _data = {
 &"walk_up_sword": SubResource("Animation_2dvfe")
 }
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oprun"]
+
 [node name="Player" type="CharacterBody2D" unique_id=1670660227 groups=["player"]]
 collision_layer = 0
 collision_mask = 3
@@ -7419,3 +7421,9 @@ vertical_alignment = 1
 [node name="FishingComponents" type="Node2D" parent="." unique_id=267292855]
 script = ExtResource("13_fgkxt")
 FishingBarScene = ExtResource("14_xsi7p")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=562693882]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=1815983488]
+scale = Vector2(5, 5)
+shape = SubResource("RectangleShape2D_oprun")

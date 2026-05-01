@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://cah1jnrhm063q"]
 
+[ext_resource type="Script" uid="uid://bfslj8sr72wy1" path="res://scripts/Beehive.cs" id="1_bh25o"]
 [ext_resource type="Texture2D" uid="uid://22c5pa6sjl7c" path="res://assets/other/beehives.png" id="1_y4bkb"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bh25o"]
@@ -11,9 +12,14 @@ size = Vector2(32, 32)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bh25o"]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_tyyc5"]
+atlas = ExtResource("1_y4bkb")
+region = Rect2(16, 0, 16, 16)
+
 [node name="Beehive" type="StaticBody2D" unique_id=804938009]
 z_index = 5
 y_sort_enabled = true
+script = ExtResource("1_bh25o")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1881276969]
 texture = SubResource("AtlasTexture_bh25o")
@@ -30,5 +36,8 @@ scale = Vector2(3, 3)
 shape = SubResource("RectangleShape2D_bh25o")
 
 [node name="GrowthTimer" type="Timer" parent="." unique_id=77474860]
+wait_time = 120.0
+autostart = true
 
 [node name="CollectIcon" type="Sprite2D" parent="." unique_id=1075792982]
+texture = SubResource("AtlasTexture_tyyc5")

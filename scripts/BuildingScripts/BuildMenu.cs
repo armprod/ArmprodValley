@@ -10,22 +10,21 @@ public partial class BuildMenu : CanvasLayer
 	{
 		Hide(); // Menu je na začátku schované
 	}
+	
+	public override void _Input(InputEvent @event)
+	{
+		if (Visible && @event.IsActionPressed("ui_cancel"))
+		{
+			ToggleMenu(); // Zavře menu
+			GetViewport().SetInputAsHandled(); // ZASTAVÍ šíření signálu k Pause Menu
+		}
+	}
 
 	// Metoda pro otevření/zavření (volá Player s kladivem)
 	public void ToggleMenu()
 	{
 		Visible = !Visible;
-		
-		if (Visible)
-		{
-			Input.MouseMode = Input.MouseModeEnum.Visible;
-			// Tohle zajistí, že menu bude mít prioritu pro myš
-			GetViewport().SetInputAsHandled(); 
-		}
-		else
-		{
-			Input.MouseMode = Input.MouseModeEnum.Captured;
-		}
+		Input.MouseMode = Input.MouseModeEnum.Visible; 
 	}
 
 	// Tuto metodu napojíme na 'pressed' signál tvého Beehive tlačítka

@@ -9,9 +9,12 @@ public partial class Player : CharacterBody2D
 		set { _money = value; UpdateMoneyUI(); } 
 	}
 
-	[Export] public TileMapLayer WaterLayer;
 	[Export] public float Speed = 100.0f;
+	[Export] public float MaxInteractionDistance = 60.0f;
+	[Export] public TileMapLayer WaterLayer;
+	[Export] public int _beehivePrice = 10000;
 	
+	// GENERAL
 	private AnimationPlayer _animPlayer;
 	private int _money = 0;
 	private Label _moneyLabel;
@@ -21,19 +24,21 @@ public partial class Player : CharacterBody2D
 	private string _lastDirStr = "down";
 	
 	private FishingSystem _fishing;
-	private BuildMenu _buildMenu;
 
-	// SYSTÉM STAVĚNÍ
+	// BUILDING SYSTEM
 	private Node2D _ghostBuilding;      
 	private PackedScene _buildingToPlace; 
 	private bool _isPlacing = false;  
-	private bool _canPlaceNow = false; // Pojistka proti okamžitému položení    
+	private bool _canPlaceNow = false;
+	private BuildMenu _buildMenu;
+	private Area2D _interactionArea;
 
 	public override void _Ready()
 	{
 		_animPlayer = GetNodeOrNull<AnimationPlayer>("AnimationPlayer");
 		_fishing = GetNodeOrNull<FishingSystem>("FishingComponents");
 		_moneyLabel = GetNodeOrNull<Label>("MoneyLayout/Label");
+		_interactionArea = GetNodeOrNull<Area2D>("InteractionArea");
 		
 		_buildMenu = GetTree().CurrentScene.FindChild("BuildMenu", true, false) as BuildMenu;
 		if (_buildMenu != null)
@@ -62,19 +67,23 @@ public partial class Player : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		// Logika pro "ducha" stavby
 		if (_isPlacing && _ghostBuilding != null)
 		{
-			// Duch sleduje myš
 			_ghostBuilding.GlobalPosition = GetGlobalMousePosition();
+			
+			Vector2 mousePos = GetGlobalMousePosition();
+			int gridSize = 16;
+			float snappedX = Mathf.Floor(mousePos.X / gridSize) * gridSize;
+			float snappedY = Mathf.Floor(mousePos.Y / gridSize) * gridSize;
+			_ghostBuilding.GlobalPosition = new Vector2(snappedX, snappedY);
+			_ghostBuilding.GlobalPosition = new Vector2(snappedX, snappedY);
+			_ghostBuilding.Modulate = (Money >= _beehivePrice) ? new Color(1, 1, 1, 0.5f) : new Color(1, 0, 0, 0.5f);
 
-			// POJISTKA: Čekáme, až hráč pustí tlačítko z menu, než dovolíme stavět
 			if (!_canPlaceNow && !Input.IsActionPressed("action_use"))
 			{
 				_canPlaceNow = true;
 			}
 			
-			// Samotné položení budovy
 			if (_canPlaceNow && Input.IsActionJustPressed("action_use"))
 			{
 				PlaceRealBuilding();
@@ -117,9 +126,21 @@ public partial class Player : CharacterBody2D
 
 	public override void _Input(InputEvent @event)
 	{
+		if (_isPlacing && @event.IsActionPressed("ui_cancel"))
+		{
+			CancelPlacement();
+			GetViewport().SetInputAsHandled();
+			return;
+		}
+
 		if (_isActing || _isPlacing) return;
 
 		HandleSlotInput(@event);
+
+		if (@event.IsActionPressed("action_interact"))
+		{
+			HandleInteraction(false); 
+		}
 
 		if (@event.IsActionPressed("action_use"))
 		{    
@@ -142,27 +163,55 @@ public partial class Player : CharacterBody2D
 			if (!string.IsNullOrEmpty(_currentToolSuffix))
 			{
 				PlayToolAnimation();
+				
+				if (_currentToolSuffix == "_pickaxe")
+				{
+					HandleInteraction(true); 
+				}
 			}
 		}
 	}
 
-	// --- VEŘEJNÉ METODY PRO OSTATNÍ SYSTÉMY ---
+	private void HandleInteraction(bool isAttack)
+	{
+		if (_interactionArea == null) 
+		{
+			GD.Print("Chyba: InteractionArea u hráče chybí!");
+			return;
+		}
 
-	public void AddMoney(int amount) 
-	{ 
-		_money += amount; 
-		UpdateMoneyUI(); 
-	}
+		var targets = _interactionArea.GetOverlappingBodies();
+		GD.Print($"Area detekuje {targets.Count} objektů."); // Tohle nám řekne, jestli area funguje
 
-	public void SetMoney(int amount) 
-	{ 
-		_money = amount; 
-		UpdateMoneyUI(); 
+		foreach (var body in targets)
+		{
+			GD.Print("Detekován objekt: " + body.Name); // Uvidíme jména všech kolizí
+			if (body is Beehive beehive)
+			{
+				if (GlobalPosition.DistanceTo(beehive.GlobalPosition) > MaxInteractionDistance)
+				{
+					GD.Print("Úl je moc daleko!");
+					continue;
+				}
+
+				if (isAttack) 
+				{
+					GD.Print("Útok krumpáčem na úl!");
+					beehive.Destroy(this);
+				}
+				else 
+				{
+					beehive.HarvestHoney(this);
+				}
+				return; 
+			}
+		}
 	}
 
 	public bool IsFacingWater()
 	{
 		if (WaterLayer == null) return false;
+		// Kontrola 24 pixelů před hráčem
 		Vector2 checkPos = GlobalPosition + (_lookDirection * 24);
 		Vector2I tilePos = WaterLayer.LocalToMap(WaterLayer.ToLocal(checkPos));
 		return WaterLayer.GetCellTileData(tilePos) != null;
@@ -173,43 +222,40 @@ public partial class Player : CharacterBody2D
 	private void StartGhostPlacement(string scenePath)
 	{
 		if (_ghostBuilding != null) _ghostBuilding.QueueFree();
-		
 		Input.MouseMode = Input.MouseModeEnum.Visible;
 
 		_buildingToPlace = GD.Load<PackedScene>(scenePath);
 		_ghostBuilding = _buildingToPlace.Instantiate<Node2D>();
 		_ghostBuilding.Modulate = new Color(1, 1, 1, 0.5f);
-		
-		// Vypnutí kolizí u ducha
-		DisableCollisionRecursive(_ghostBuilding);
+		_ghostBuilding.TopLevel = true; 
 
-		// Přidání do scény (mimo hráče)
+		DisableCollisionRecursive(_ghostBuilding);
 		GetTree().CurrentScene.AddChild(_ghostBuilding);
 		
 		_isPlacing = true;
-		_canPlaceNow = false; // Resetujeme pojistku
+		_canPlaceNow = false; 
 	}
 
 	private void DisableCollisionRecursive(Node node)
 	{
 		if (node is CollisionShape2D cs) cs.Disabled = true;
 		if (node is CollisionPolygon2D cp) cp.Disabled = true;
-
-		foreach (Node child in node.GetChildren())
-		{
-			DisableCollisionRecursive(child);
-		}
+		foreach (Node child in node.GetChildren()) DisableCollisionRecursive(child);
 	}
 
 	private void PlaceRealBuilding()
 	{
 		if (_buildingToPlace == null) return;
-
-		var realBuilding = _buildingToPlace.Instantiate<Node2D>();
-		GetTree().CurrentScene.AddChild(realBuilding);
-		realBuilding.GlobalPosition = _ghostBuilding.GlobalPosition;
-
-		CancelPlacement();
+		if (Money >= _beehivePrice)
+		{
+			RemoveMoney(_beehivePrice);
+			var realBuilding = _buildingToPlace.Instantiate<Node2D>();
+			GetTree().CurrentScene.AddChild(realBuilding);
+			realBuilding.GlobalPosition = _ghostBuilding.GlobalPosition;
+			CancelPlacement();
+		} else {
+			GD.Print("Nedostatek financí.");
+		}
 	}
 
 	private void CancelPlacement()
@@ -221,16 +267,14 @@ public partial class Player : CharacterBody2D
 		_buildingToPlace = null;
 	}
 
-	// --- ZBYTEK LOGIKY NÁSTROJŮ A ANIMACÍ ---
+	// --- POMOCNÉ METODY ---
 
+	public void AddMoney(int amount) { _money += amount; UpdateMoneyUI(); }
+	public void RemoveMoney(int amount) { _money -= amount; UpdateMoneyUI(); }
+	
 	private void HandleSlotInput(InputEvent @event)
 	{
-		if (@event.IsActionPressed("slot_7")) 
-		{
-			ToggleFishing();
-			return;
-		}
-
+		if (@event.IsActionPressed("slot_7")) { ToggleFishing(); return; }
 		if (_currentToolSuffix == "_rod") return; 
 
 		if (@event.IsActionPressed("slot_0")) _currentToolSuffix = "_seed";
@@ -248,18 +292,15 @@ public partial class Player : CharacterBody2D
 	{
 		if (_animPlayer == null) return;
 		string animName = "walk_" + _lastDirStr + _currentToolSuffix;
-		if (_animPlayer.CurrentAnimation != animName)
-		{
-			if (_animPlayer.HasAnimation(animName)) _animPlayer.Play(animName);
-			else _animPlayer.Play("walk_" + _lastDirStr);
-		}
+		if (_animPlayer.HasAnimation(animName)) _animPlayer.Play(animName);
+		else _animPlayer.Play("walk_" + _lastDirStr);
 	}
 
 	private void PlayIdleAnimation()
 	{
 		if (_animPlayer == null) return;
 		string animName = "idle_" + _lastDirStr + GetCurrentCombinedSuffix();
-		if (_animPlayer.CurrentAnimation != animName) _animPlayer.Play(animName);
+		if (_animPlayer.HasAnimation(animName)) _animPlayer.Play(animName);
 	}
 
 	private void PlayToolAnimation()
@@ -271,22 +312,13 @@ public partial class Player : CharacterBody2D
 	}
 
 	private void UpdateMoneyUI() { if (_moneyLabel != null) _moneyLabel.Text = $"{_money} €"; }
-	
 	private string GetCurrentCombinedSuffix() => (_fishing != null && _fishing.CurrentState != FishingSystem.FishingState.None) ? "_rod" : _currentToolSuffix;
 
 	private void ToggleFishing()
 	{
 		if (_fishing == null) return;
-		if (_fishing.CurrentState == FishingSystem.FishingState.None)
-		{
-			_fishing.CurrentState = FishingSystem.FishingState.HoldingRod;
-			_currentToolSuffix = "_rod";
-		}
-		else
-		{
-			_fishing.CurrentState = FishingSystem.FishingState.None;
-			_currentToolSuffix = "";
-		}
+		if (_fishing.CurrentState == FishingSystem.FishingState.None) { _fishing.CurrentState = FishingSystem.FishingState.HoldingRod; _currentToolSuffix = "_rod"; }
+		else { _fishing.CurrentState = FishingSystem.FishingState.None; _currentToolSuffix = ""; }
 		PlayIdleAnimation();
 	}
 
