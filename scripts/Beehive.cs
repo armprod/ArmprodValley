@@ -57,4 +57,24 @@ public partial class Beehive : StaticBody2D
 		player.AddMoney(5000);
 		QueueFree();
 	}
+	
+	public Godot.Collections.Dictionary<string, Variant> Save()
+	{
+		return new Godot.Collections.Dictionary<string, Variant>()
+		{
+			{ "PosX", GlobalPosition.X },
+			{ "PosY", GlobalPosition.Y },
+			{ "CurrentStage", _currentStage }
+		};
+	}
+	
+	public int GetCurrentStage() {return _currentStage; }
+	
+	public void LoadFromSave(int stage)
+	{
+		_currentStage = stage;
+		
+		if (_sprite != null) _sprite.Frame = _startFrame + _currentStage;
+		if (_currentStage >= MaxStages - 1)  _collectIcon.Visible = true;
+	}
 }

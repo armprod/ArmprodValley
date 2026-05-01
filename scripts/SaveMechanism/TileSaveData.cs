@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class TileSaveData
 {
@@ -8,4 +9,5 @@ public class TileSaveData
 	public Vector2I PlantAtlasPos { get; set; }  // Pro PlantsLayer
 	public bool HasPlant { get; set; }
 	public ulong PlantStartTime { get; set; }
+	public List<BeehiveSaveData> Beehives { get; set; } = new List<BeehiveSaveData>();
 }

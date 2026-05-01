@@ -174,37 +174,37 @@ public partial class Player : CharacterBody2D
 
 	private void HandleInteraction(bool isAttack)
 	{
-		if (_interactionArea == null) 
-		{
-			GD.Print("Chyba: InteractionArea u hráče chybí!");
-			return;
-		}
+		if (_interactionArea == null) return;
 
 		var targets = _interactionArea.GetOverlappingBodies();
-		GD.Print($"Area detekuje {targets.Count} objektů."); // Tohle nám řekne, jestli area funguje
+		Beehive bestTarget = null;
+		float minMouseDist = float.MaxValue;
+		Vector2 mousePos = GetGlobalMousePosition();
 
 		foreach (var body in targets)
 		{
-			GD.Print("Detekován objekt: " + body.Name); // Uvidíme jména všech kolizí
 			if (body is Beehive beehive)
 			{
+				// Kontrola, jestli není úl úplně mimo dosah hráče
 				if (GlobalPosition.DistanceTo(beehive.GlobalPosition) > MaxInteractionDistance)
-				{
-					GD.Print("Úl je moc daleko!");
 					continue;
-				}
 
-				if (isAttack) 
+				// Výpočet vzdálenosti od myši k úlu
+				float distToMouse = mousePos.DistanceTo(beehive.GlobalPosition);
+				
+				if (distToMouse < minMouseDist)
 				{
-					GD.Print("Útok krumpáčem na úl!");
-					beehive.Destroy(this);
+					minMouseDist = distToMouse;
+					bestTarget = beehive;
 				}
-				else 
-				{
-					beehive.HarvestHoney(this);
-				}
-				return; 
 			}
+		}
+
+		// Teď interakci provedeme jen JEDNOU pro ten nejvhodnější úl
+		if (bestTarget != null)
+		{
+			if (isAttack) bestTarget.Destroy(this);
+			else bestTarget.HarvestHoney(this);
 		}
 	}
 

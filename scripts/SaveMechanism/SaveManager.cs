@@ -70,6 +70,22 @@ public partial class SaveManager : Node
 		{
 			GD.PrintErr("KRITICKÁ CHYBA: FarmingLayerNode nebyl nalezen ani po záchranném pokusu!");
 		}
+		
+		data.Beehives.Clear(); // Předpokládám, že máš tento List v SaveData
+		var beehiveNodes = GetTree().GetNodesInGroup("beehives");
+		GD.Print($"Nalezeno úlů k uložení: {beehiveNodes.Count}");
+
+		foreach (Node node in beehiveNodes)
+		{
+			if (node is Beehive beehive)
+			{
+				data.Beehives.Add(new BeehiveSaveData {
+					Pos = beehive.GlobalPosition,
+					// Pokud máš _currentStage jako private, udělej si na ni public getter
+					CurrentStage = beehive.GetCurrentStage() 
+				});
+			}
+		}
 
 		// Uložení do JSONu (nezapomeň na ty Options, jinak Vector2I nebude fungovat!)
 		var options = new JsonSerializerOptions { IncludeFields = true, WriteIndented = true };
@@ -83,25 +99,14 @@ public partial class SaveManager : Node
 	public SaveData LoadGame(int id) 
 	{
 		string path = GetSavePath(id);
-		if (!FileAccess.FileExists(path)) 
-		{
-			return null;
-		}
+		if (!FileAccess.FileExists(path)) return null;
 
 		using var file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
 		string jsonText = file.GetAsText();
 		SaveData data = JsonSerializer.Deserialize<SaveData>(jsonText, _jsonOptions);
 
-		if (data == null)
-		{
-			GD.PrintErr("CHYBA: Nepodařilo se přeložit JSON (data jsou null)!");
-			return null;
-		}
-
-		if (FarmingLayerNode == null)
-		{
-			return data; 
-		}
+		if (data == null) return null;
+		if (FarmingLayerNode == null) return data; 
 
 		// Pokud jsme došli sem, začneme kreslit
 		FarmingLayerNode.Clear();
@@ -117,8 +122,23 @@ public partial class SaveManager : Node
 				PlantsLayerNode?.SetCell(tile.Pos, 0, tile.PlantAtlasPos);
 			}
 		}
+		
+		foreach (Node node in GetTree().GetNodesInGroup("beehives")) node.QueueFree();
+		PackedScene beehiveScene = GD.Load<PackedScene>("res://scenes/Beehive.tscn");
+		
+		foreach (var bData in data.Beehives)
+		{
+			var newBeehive = beehiveScene.Instantiate<Beehive>();
+			// Je důležité přidat ho do scény dřív, než začneš nastavovat věci z _Ready
+			GetTree().CurrentScene.AddChild(newBeehive); 
+			
+			newBeehive.GlobalPosition = bData.Pos;
+			// Metoda v Beehive.cs, která nastaví stage a aktualizuje sprite
+			newBeehive.LoadFromSave(bData.CurrentStage); 
+		}
 
-		GD.Print($"ÚSPĚCH: Načteno {data.FarmTiles.Count} políček z disku.");
+
+		GD.Print($"ÚSPĚCH: Načteno {data.FarmTiles.Count} políček a {data.Beehives.Count} úlů.");
 		return data;
 	}
 
