@@ -4,6 +4,10 @@
 [ext_resource type="Script" uid="uid://gb2hlywgd8kx" path="res://scripts/BuildingScripts/BuildMenu.cs" id="1_xldf8"]
 [ext_resource type="Texture2D" uid="uid://22c5pa6sjl7c" path="res://assets/other/beehives.png" id="2_t25fu"]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_cxony"]
+atlas = ExtResource("2_t25fu")
+region = Rect2(32, 0, 16, 16)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_xldf8"]
 atlas = ExtResource("2_t25fu")
 region = Rect2(0, 0, 16, 16)
@@ -61,6 +65,19 @@ layout_mode = 2
 mouse_filter = 2
 columns = 3
 
+[node name="FruitTreeButton" type="TextureButton" parent="CenterContainer/MenuWindow/MarginContainer/VBoxContainer/ScrollContainer/GridContainer" unique_id=2000732833]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/MenuWindow/MarginContainer/VBoxContainer/ScrollContainer/GridContainer/FruitTreeButton" unique_id=1910130436]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_cxony")
+
 [node name="BeehiveButton" type="TextureButton" parent="CenterContainer/MenuWindow/MarginContainer/VBoxContainer/ScrollContainer/GridContainer" unique_id=2064744015]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
@@ -78,4 +95,5 @@ expand_mode = 1
 stretch_mode = 5
 
 [connection signal="BuildingSelected" from="." to="." method="OnBuildingSelected"]
+[connection signal="pressed" from="CenterContainer/MenuWindow/MarginContainer/VBoxContainer/ScrollContainer/GridContainer/FruitTreeButton" to="." method="OnFruitTreeButtonPressed"]
 [connection signal="pressed" from="CenterContainer/MenuWindow/MarginContainer/VBoxContainer/ScrollContainer/GridContainer/BeehiveButton" to="." method="OnBeehiveButtonPressed"]

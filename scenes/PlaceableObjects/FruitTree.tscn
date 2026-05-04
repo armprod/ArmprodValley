@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://8qtgqv2scanl"]
+
+[ext_resource type="Script" uid="uid://b0uo36bkq4use" path="res://scripts/FruitTree.cs" id="1_pqxax"]
+[ext_resource type="Texture2D" uid="uid://oxakqge0reb0" path="res://assets/other/apple_tree.png" id="2_s357x"]
+[ext_resource type="Texture2D" uid="uid://22c5pa6sjl7c" path="res://assets/other/beehives.png" id="3_1b58p"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jo8ri"]
+size = Vector2(22, 34)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eg4ad"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eg4ad"]
+atlas = ExtResource("3_1b58p")
+region = Rect2(48, 0, 16, 16)
+
+[node name="FruitTree" type="StaticBody2D" unique_id=1255993757 groups=["trees"]]
+z_index = 10
+scale = Vector2(3, 3)
+script = ExtResource("1_pqxax")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=361983791]
+texture = ExtResource("2_s357x")
+hframes = 2
+vframes = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1371440721]
+position = Vector2(1, 14)
+shape = SubResource("RectangleShape2D_jo8ri")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=1972652304]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=1640181487]
+scale = Vector2(4, 4)
+shape = SubResource("RectangleShape2D_eg4ad")
+
+[node name="GrowthTimer" type="Timer" parent="." unique_id=1685630449]
+wait_time = 180.0
+autostart = true
+
+[node name="CollectIcon" type="Sprite2D" parent="." unique_id=306326602]
+texture = SubResource("AtlasTexture_eg4ad")

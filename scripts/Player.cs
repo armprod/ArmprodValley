@@ -12,13 +12,14 @@ public partial class Player : CharacterBody2D
 	[Export] public float Speed = 100.0f;
 	[Export] public float MaxInteractionDistance = 60.0f;
 	[Export] public TileMapLayer WaterLayer;
-	[Export] public int _beehivePrice = 10000;
+	[Export] private int _beehivePrice = 10000;
+	[Export] private int _fruitTreePrice = 5000;
 	
 	// GENERAL
 	private AnimationPlayer _animPlayer;
 	private int _money = 0;
 	private Label _moneyLabel;
-	private string _currentToolSuffix = ""; 
+	public string _currentToolSuffix = ""; 
 	private bool _isActing = false;
 	private Vector2 _lookDirection = Vector2.Down;
 	private string _lastDirStr = "down";
@@ -32,6 +33,9 @@ public partial class Player : CharacterBody2D
 	private bool _canPlaceNow = false;
 	private BuildMenu _buildMenu;
 	private Area2D _interactionArea;
+	private int _currentPrice;
+	private bool _isPlacingBeehive = false;
+	private bool _isPlacingTree = false;
 
 	public override void _Ready()
 	{
@@ -43,7 +47,7 @@ public partial class Player : CharacterBody2D
 		_buildMenu = GetTree().CurrentScene.FindChild("BuildMenu", true, false) as BuildMenu;
 		if (_buildMenu != null)
 		{
-			_buildMenu.BuildingSelected += StartGhostPlacement;
+			_buildMenu.BuildingSelected += (scenePath, price) => StartGhostPlacement(scenePath, price);
 		}
 
 		if (_animPlayer != null)
@@ -69,29 +73,23 @@ public partial class Player : CharacterBody2D
 	{
 		if (_isPlacing && _ghostBuilding != null)
 		{
-			_ghostBuilding.GlobalPosition = GetGlobalMousePosition();
-			
 			Vector2 mousePos = GetGlobalMousePosition();
 			int gridSize = 16;
+			
+			// Výpočet mřížky
 			float snappedX = Mathf.Floor(mousePos.X / gridSize) * gridSize;
 			float snappedY = Mathf.Floor(mousePos.Y / gridSize) * gridSize;
 			_ghostBuilding.GlobalPosition = new Vector2(snappedX, snappedY);
-			_ghostBuilding.GlobalPosition = new Vector2(snappedX, snappedY);
-			_ghostBuilding.Modulate = (Money >= _beehivePrice) ? new Color(1, 1, 1, 0.5f) : new Color(1, 0, 0, 0.5f);
+
+			int currentPrice = GetCurrentBuildingPrice();
+			_ghostBuilding.Modulate = (Money >= currentPrice) ? new Color(1, 1, 1, 0.5f) : new Color(1, 0, 0, 0.5f);
 
 			if (!_canPlaceNow && !Input.IsActionPressed("action_use"))
-			{
 				_canPlaceNow = true;
-			}
-			
 			if (_canPlaceNow && Input.IsActionJustPressed("action_use"))
-			{
 				PlaceRealBuilding();
-			}
 			else if (Input.IsActionJustPressed("ui_cancel"))
-			{
 				CancelPlacement();
-			}
 			
 			Velocity = Vector2.Zero;
 			MoveAndSlide();
@@ -164,7 +162,7 @@ public partial class Player : CharacterBody2D
 			{
 				PlayToolAnimation();
 				
-				if (_currentToolSuffix == "_pickaxe")
+				if (_currentToolSuffix == "_pickaxe" || _currentToolSuffix == "_axe")
 				{
 					HandleInteraction(true); 
 				}
@@ -177,34 +175,31 @@ public partial class Player : CharacterBody2D
 		if (_interactionArea == null) return;
 
 		var targets = _interactionArea.GetOverlappingBodies();
-		Beehive bestTarget = null;
+		IInteractable bestTarget = null; // Používáme Interface!
 		float minMouseDist = float.MaxValue;
 		Vector2 mousePos = GetGlobalMousePosition();
 
 		foreach (var body in targets)
 		{
-			if (body is Beehive beehive)
+			// Ptáme se: "Implementuje tento objekt rozhraní IInteractable?"
+			if (body is IInteractable interactable)
 			{
-				// Kontrola, jestli není úl úplně mimo dosah hráče
-				if (GlobalPosition.DistanceTo(beehive.GlobalPosition) > MaxInteractionDistance)
+				if (GlobalPosition.DistanceTo(interactable.GlobalPosition) > MaxInteractionDistance)
 					continue;
 
-				// Výpočet vzdálenosti od myši k úlu
-				float distToMouse = mousePos.DistanceTo(beehive.GlobalPosition);
-				
+				float distToMouse = mousePos.DistanceTo(interactable.GlobalPosition);
 				if (distToMouse < minMouseDist)
 				{
 					minMouseDist = distToMouse;
-					bestTarget = beehive;
+					bestTarget = interactable;
 				}
 			}
 		}
 
-		// Teď interakci provedeme jen JEDNOU pro ten nejvhodnější úl
 		if (bestTarget != null)
 		{
 			if (isAttack) bestTarget.Destroy(this);
-			else bestTarget.HarvestHoney(this);
+			else bestTarget.Interact(this); // Volá správnou metodu podle typu objektu
 		}
 	}
 
@@ -219,10 +214,15 @@ public partial class Player : CharacterBody2D
 
 	// --- SYSTÉM STAVĚNÍ ---
 
-	private void StartGhostPlacement(string scenePath)
+	private void StartGhostPlacement(string scenePath, int price)
 	{
 		if (_ghostBuilding != null) _ghostBuilding.QueueFree();
 		Input.MouseMode = Input.MouseModeEnum.Visible;
+
+		// Nastavení ceny a typu stavby
+		_currentPrice = price;
+		_isPlacingBeehive = scenePath.Contains("Beehive");
+		_isPlacingTree = scenePath.Contains("FruitTree");
 
 		_buildingToPlace = GD.Load<PackedScene>(scenePath);
 		_ghostBuilding = _buildingToPlace.Instantiate<Node2D>();
@@ -246,9 +246,9 @@ public partial class Player : CharacterBody2D
 	private void PlaceRealBuilding()
 	{
 		if (_buildingToPlace == null) return;
-		if (Money >= _beehivePrice)
+		if (Money >= _currentPrice)
 		{
-			RemoveMoney(_beehivePrice);
+			RemoveMoney(_currentPrice);
 			var realBuilding = _buildingToPlace.Instantiate<Node2D>();
 			GetTree().CurrentScene.AddChild(realBuilding);
 			realBuilding.GlobalPosition = _ghostBuilding.GlobalPosition;
@@ -336,4 +336,12 @@ public partial class Player : CharacterBody2D
 		if (Mathf.Abs(dir.X) > Mathf.Abs(dir.Y)) return dir.X > 0 ? "right" : "left";
 		return dir.Y > 0 ? "down" : "up";
 	}
+	
+	private int GetCurrentBuildingPrice()
+	{
+		if (_isPlacingBeehive) return _beehivePrice;
+		if (_isPlacingTree) return _fruitTreePrice;
+		return 0;
+	}
+	
 }

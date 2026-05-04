@@ -86,6 +86,21 @@ public partial class SaveManager : Node
 				});
 			}
 		}
+		
+		data.FruitTrees.Clear(); // Přidejte tento List do třídy SaveData
+		var treeNodes = GetTree().GetNodesInGroup("trees");
+		GD.Print($"Nalezeno stromů k uložení: {treeNodes.Count}");
+
+		foreach (Node node in treeNodes)
+		{
+			if (node is FruitTree tree) // Předpokládám název třídy FruitTree
+			{
+				data.FruitTrees.Add(new FruitTreesSaveData {
+					Pos = tree.GlobalPosition,
+					CurrentStage = tree.GetCurrentStage()
+				});
+			}
+		}
 
 		// Uložení do JSONu (nezapomeň na ty Options, jinak Vector2I nebude fungovat!)
 		var options = new JsonSerializerOptions { IncludeFields = true, WriteIndented = true };
@@ -124,21 +139,26 @@ public partial class SaveManager : Node
 		}
 		
 		foreach (Node node in GetTree().GetNodesInGroup("beehives")) node.QueueFree();
-		PackedScene beehiveScene = GD.Load<PackedScene>("res://scenes/Beehive.tscn");
-		
+		PackedScene beehiveScene = GD.Load<PackedScene>("res://scenes/PlaceableObjects/Beehive.tscn");
 		foreach (var bData in data.Beehives)
 		{
 			var newBeehive = beehiveScene.Instantiate<Beehive>();
-			// Je důležité přidat ho do scény dřív, než začneš nastavovat věci z _Ready
 			GetTree().CurrentScene.AddChild(newBeehive); 
-			
 			newBeehive.GlobalPosition = bData.Pos;
-			// Metoda v Beehive.cs, která nastaví stage a aktualizuje sprite
 			newBeehive.LoadFromSave(bData.CurrentStage); 
+		}
+		
+		PackedScene treeScene = GD.Load<PackedScene>("res://scenes/PlaceableObjects/FruitTree.tscn");
+		foreach (var tData in data.FruitTrees)
+		{
+			var newTree = treeScene.Instantiate<FruitTree>();
+			GetTree().CurrentScene.AddChild(newTree); 
+			newTree.GlobalPosition = tData.Pos;
+			newTree.LoadFromSave(tData.CurrentStage); 
 		}
 
 
-		GD.Print($"ÚSPĚCH: Načteno {data.FarmTiles.Count} políček a {data.Beehives.Count} úlů.");
+		GD.Print($"ÚSPĚCH: Načteno {data.FarmTiles.Count} políček, {data.Beehives.Count} úlů a {data.FruitTrees.Count} stromů.");
 		return data;
 	}
 
