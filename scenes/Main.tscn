@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://dr843w8u54q55" path="res://assets/terrain/farming_pallet.png" id="5_nxtc6"]
 [ext_resource type="Script" uid="uid://trfm5d8tp41l" path="res://scripts/FarmingSystem.cs" id="6_c01mt"]
 [ext_resource type="PackedScene" uid="uid://bdbkfdajdjdi2" path="res://scenes/MenuScenes/BuildMenu.tscn" id="8_jlsqs"]
+[ext_resource type="Script" uid="uid://bgqte50iyx8ju" path="res://scripts/WorldLight.cs" id="9_q8u5g"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lhr70"]
 texture = ExtResource("3_nxtc6")
@@ -449,3 +450,7 @@ tile_map_data = PackedByteArray("AABbAPn/AAAAAAAAAABbAPj/AAAAAAAAAABbAPf/AAAAAAA
 tile_set = SubResource("TileSet_3dxm6")
 
 [node name="BuildMenu" parent="." unique_id=1543513687 instance=ExtResource("8_jlsqs")]
+visible = false
+
+[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=754021075]
+script = ExtResource("9_q8u5g")

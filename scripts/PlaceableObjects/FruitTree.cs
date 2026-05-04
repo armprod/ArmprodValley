@@ -17,7 +17,7 @@ public partial class FruitTree : StaticBody2D, IInteractable
 		_growthTimer = GetNode<Timer>("GrowthTimer");
 		_collectIcon = GetNode<Sprite2D>("CollectIcon");
 
-		_collectIcon.Visible = false; // Na začátku schováme ikonu
+		_collectIcon.Visible = false;
 		_sprite.Frame = _startFrame;
 
 		_growthTimer.Timeout += OnGrowthTimeout;
@@ -32,7 +32,7 @@ public partial class FruitTree : StaticBody2D, IInteractable
 
 			if (_currentStage == MaxStages - 1)
 			{
-				_collectIcon.Visible = true; // Ovoce je připravené ke sklizni, ukážeme ikonu
+				_collectIcon.Visible = true;
 				_growthTimer.Stop();
 			}
 		}
@@ -46,7 +46,7 @@ public partial class FruitTree : StaticBody2D, IInteractable
 			player.AddMoney(100);
 			_currentStage = 0;
 			_sprite.Frame = _startFrame;
-			_collectIcon.Visible = false; // Schováme ikonu po sběru
+			_collectIcon.Visible = false;
 			_growthTimer.Start();
 		}
 	}

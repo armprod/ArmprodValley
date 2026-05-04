@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://768uhvuk1orr"]
 
-[ext_resource type="Script" uid="uid://l53ed8uu6a8s" path="res://scripts/MenuScenes/SettingsMenu.cs" id="1_yelko"]
+[ext_resource type="Script" uid="uid://l53ed8uu6a8s" path="res://scripts/MenuScripts/SettingsMenu.cs" id="1_yelko"]
 [ext_resource type="FontFile" uid="uid://cnp0fwojltvh0" path="res://assets/fonts/m5x7.ttf" id="2_1yw23"]
 
 [node name="SettingsMenu" type="Control" unique_id=1599266557 node_paths=PackedStringArray("VolumeSlider", "ResOption")]

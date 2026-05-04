@@ -12,8 +12,8 @@
 [ext_resource type="Texture2D" uid="uid://c2gqhqvg01stg" path="res://assets/character/character_tool_pickaxe_animations_sprite.png" id="9_b8lor"]
 [ext_resource type="Texture2D" uid="uid://destyuacwa5lf" path="res://assets/character/character_tool_scythe_animations_sprite.png" id="10_6e537"]
 [ext_resource type="Texture2D" uid="uid://plljyomkpvj4" path="res://assets/other/idventory.png" id="11_p07f3"]
-[ext_resource type="FontFile" uid="uid://ca0edgg37rc36" path="res://assets/fonts/PixelOperator8.ttf" id="12_viqgg"]
-[ext_resource type="Script" uid="uid://ccbegvkb1a4k0" path="res://scripts/FishingSystem.cs" id="13_fgkxt"]
+[ext_resource type="Script" uid="uid://ccbegvkb1a4k0" path="res://scripts/FishingScripts/FishingSystem.cs" id="13_fgkxt"]
+[ext_resource type="FontFile" uid="uid://cnp0fwojltvh0" path="res://assets/fonts/m5x7.ttf" id="14_srp4u"]
 [ext_resource type="PackedScene" uid="uid://cjtys1bjgh2yo" path="res://scenes/FishBar.tscn" id="14_xsi7p"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
@@ -7365,12 +7365,27 @@ _data = {
 &"walk_up_sword": SubResource("Animation_2dvfe")
 }
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_0rnld"]
+atlas = ExtResource("11_p07f3")
+region = Rect2(0, 80, 64, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_srp4u"]
+atlas = ExtResource("11_p07f3")
+region = Rect2(0, 80, 64, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jfpux"]
+atlas = ExtResource("11_p07f3")
+region = Rect2(0, 80, 64, 16)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oprun"]
 
-[node name="Player" type="CharacterBody2D" unique_id=1670660227 groups=["player"]]
+[node name="Player" type="CharacterBody2D" unique_id=1670660227 node_paths=PackedStringArray("_moneyLabel", "_timeLabel", "_dayLabel") groups=["player"]]
 collision_layer = 0
 collision_mask = 3
 script = ExtResource("1_p7iby")
+_moneyLabel = NodePath("Layouts/MoneyLayout/MoneyLabel")
+_timeLabel = NodePath("Layouts/TimeLayout/TimeLabel")
+_dayLabel = NodePath("Layouts/DayLayout/DayLabel")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=692551886]
 position = Vector2(9.536743e-07, 9.536743e-07)
@@ -7398,25 +7413,68 @@ texture = ExtResource("11_p07f3")
 region_enabled = true
 region_rect = Rect2(0, 0, 160, 16)
 
-[node name="MoneyLayout" type="Sprite2D" parent="." unique_id=1483037059]
+[node name="Layouts" type="Control" parent="." unique_id=637457145]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="MoneyLayout" type="Sprite2D" parent="Layouts" unique_id=1483037059]
 z_index = 2
 position = Vector2(300, -180)
 scale = Vector2(2, 2)
-texture = ExtResource("11_p07f3")
+texture = SubResource("AtlasTexture_0rnld")
 region_enabled = true
-region_rect = Rect2(0, 80, 64, 16)
+region_rect = Rect2(0, 0, 64, 16)
 
-[node name="Label" type="Label" parent="MoneyLayout" unique_id=941289203]
+[node name="MoneyLabel" type="Label" parent="Layouts/MoneyLayout" unique_id=941289203]
+anchors_preset = -1
+anchor_bottom = 0.3125
 offset_left = -28.5
-offset_top = -3.0
+offset_top = -6.5
 offset_right = 29.0
-offset_bottom = 5.0
+offset_bottom = 1.5
 theme_override_constants/line_spacing = 0
-theme_override_fonts/font = ExtResource("12_viqgg")
-theme_override_font_sizes/font_size = 8
+theme_override_fonts/font = ExtResource("14_srp4u")
+theme_override_font_sizes/font_size = 16
 text = "0.00€"
 horizontal_alignment = 2
 vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="TimeLayout" type="Sprite2D" parent="Layouts" unique_id=1891444904]
+z_index = 2
+position = Vector2(300, -140)
+scale = Vector2(2, 2)
+texture = SubResource("AtlasTexture_srp4u")
+
+[node name="TimeLabel" type="Label" parent="Layouts/TimeLayout" unique_id=2053635532]
+offset_left = -28.5
+offset_top = -6.5
+offset_right = 29.0
+offset_bottom = 6.5
+theme_override_constants/line_spacing = 0
+theme_override_fonts/font = ExtResource("14_srp4u")
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 2
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="DayLayout" type="Sprite2D" parent="Layouts" unique_id=178870733]
+z_index = 2
+position = Vector2(300, -100)
+scale = Vector2(2, 2)
+texture = SubResource("AtlasTexture_jfpux")
+
+[node name="DayLabel" type="Label" parent="Layouts/DayLayout" unique_id=20929799]
+offset_left = -28.5
+offset_top = -7.5
+offset_right = 29.0
+offset_bottom = 5.5
+theme_override_constants/line_spacing = 0
+theme_override_fonts/font = ExtResource("14_srp4u")
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 2
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
 
 [node name="FishingComponents" type="Node2D" parent="." unique_id=267292855]
 script = ExtResource("13_fgkxt")

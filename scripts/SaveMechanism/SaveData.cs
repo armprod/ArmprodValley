@@ -11,6 +11,8 @@ public class SaveData
 	public Vector2 PlayerPosition { get; set; }
 	public List<BeehiveSaveData> Beehives { get; set; } = new List<BeehiveSaveData>();
 	public List<FruitTreesSaveData> FruitTrees { get; set; } = new List<FruitTreesSaveData>();
+	public int CurrentDay;
+	public float TotalSeconds;
 }
 
 public class BeehiveSaveData

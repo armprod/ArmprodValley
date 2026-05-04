@@ -15,10 +15,13 @@ public partial class Player : CharacterBody2D
 	[Export] private int _beehivePrice = 10000;
 	[Export] private int _fruitTreePrice = 5000;
 	
+	[Export]private Label _moneyLabel;
+	[Export]private Label _timeLabel;
+	[Export]private Label _dayLabel;
+	
 	// GENERAL
 	private AnimationPlayer _animPlayer;
 	private int _money = 0;
-	private Label _moneyLabel;
 	public string _currentToolSuffix = ""; 
 	private bool _isActing = false;
 	private Vector2 _lookDirection = Vector2.Down;
@@ -41,7 +44,8 @@ public partial class Player : CharacterBody2D
 	{
 		_animPlayer = GetNodeOrNull<AnimationPlayer>("AnimationPlayer");
 		_fishing = GetNodeOrNull<FishingSystem>("FishingComponents");
-		_moneyLabel = GetNodeOrNull<Label>("MoneyLayout/Label");
+		_moneyLabel = GetNodeOrNull<Label>("Layouts/MoneyLayout/MoneyLabel");
+		_timeLabel = GetNodeOrNull<Label>("Layouts/TimeLayout/TimeLabel");
 		_interactionArea = GetNodeOrNull<Area2D>("InteractionArea");
 		
 		_buildMenu = GetTree().CurrentScene.FindChild("BuildMenu", true, false) as BuildMenu;
@@ -66,6 +70,22 @@ public partial class Player : CharacterBody2D
 				GlobalPosition = new Vector2(0, -500);
 				this.Money = data.Money;
 			}
+		}
+		
+		var timeManager = GetTree().Root.FindChild("TimeManager", true, false) as TimeManager;
+
+		if (timeManager != null)
+		{
+			// Propojíme signál s metodou UpdateTimelineUI
+			timeManager.Connect(TimeManager.SignalName.TimeChanged, Callable.From<int, int, int>(UpdateTimelineUI));
+			
+			// Hned po startu tam něco vypíšeme, abychom viděli, že to funguje
+			UpdateTimelineUI(timeManager.CurrentDay, 8, 0);
+			GD.Print("PLAYER: Úspěšně připojeno k TimeManageru.");
+		}
+		else
+		{
+			GD.PrintErr("PLAYER: TimeManager nebyl ve scéně nalezen!");
 		}
 	}
 
@@ -342,6 +362,31 @@ public partial class Player : CharacterBody2D
 		if (_isPlacingBeehive) return _beehivePrice;
 		if (_isPlacingTree) return _fruitTreePrice;
 		return 0;
+	}
+	
+	// Metoda, která se zavolá při každém "tiknutí" minuty
+	private void OnTimeChanged(int day, int hour, int minute)
+	{
+		if (GodotObject.IsInstanceValid(_timeLabel))
+			UpdateTimelineUI(day, hour, minute);
+	}
+
+	private void UpdateTimelineUI(int day, int hour, int minute)
+	{
+		string[] weekDays = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+		string currentDayName = weekDays[day % 7];
+
+		if (_timeLabel != null)
+			_timeLabel.Text = $"{currentDayName}. {hour:D2}:{minute:D2}";
+
+		if (_dayLabel != null)
+			_dayLabel.Text = $"Day: {day}";
+	}
+	
+	public override void _ExitTree()
+	{
+		if (TimeManager.Instance != null)
+			TimeManager.Instance.TimeChanged -= OnTimeChanged;
 	}
 	
 }

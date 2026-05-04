@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://cjtys1bjgh2yo"]
 
-[ext_resource type="Script" uid="uid://dsn4fbcnhldk6" path="res://scripts/FishBar.cs" id="1_aebqi"]
+[ext_resource type="Script" uid="uid://dsn4fbcnhldk6" path="res://scripts/FishingScripts/FishBar.cs" id="1_aebqi"]
 [ext_resource type="Texture2D" uid="uid://crshsgkam8s6o" path="res://assets/fishing/fishing_assets.png" id="1_b0fop"]
-[ext_resource type="Script" uid="uid://bsqw56clnyitr" path="res://scripts/inside_bar.cs" id="2_jirww"]
-[ext_resource type="Script" uid="uid://dsoyrgewn3ea1" path="res://scripts/Fish.cs" id="4_ugnom"]
+[ext_resource type="Script" uid="uid://bsqw56clnyitr" path="res://scripts/FishingScripts/inside_bar.cs" id="2_jirww"]
+[ext_resource type="Script" uid="uid://dsoyrgewn3ea1" path="res://scripts/FishingScripts/Fish.cs" id="4_ugnom"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g6bds"]
 size = Vector2(5, 45)

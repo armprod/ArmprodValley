@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cah1jnrhm063q"]
 
-[ext_resource type="Script" uid="uid://bfslj8sr72wy1" path="res://scripts/Beehive.cs" id="1_bh25o"]
+[ext_resource type="Script" uid="uid://bfslj8sr72wy1" path="res://scripts/PlaceableObjects/Beehive.cs" id="1_bh25o"]
 [ext_resource type="Texture2D" uid="uid://22c5pa6sjl7c" path="res://assets/other/beehives.png" id="1_y4bkb"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bh25o"]

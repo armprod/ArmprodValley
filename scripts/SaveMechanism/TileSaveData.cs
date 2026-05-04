@@ -5,9 +5,9 @@ using System.Collections.Generic;
 public class TileSaveData
 {
 	public Vector2I Pos { get; set; }
-	public Vector2I GroundAtlasPos { get; set; } // Pro FarmingLayer
-	public Vector2I PlantAtlasPos { get; set; }  // Pro PlantsLayer
+	public Vector2I GroundAtlasPos { get; set; }
+	public Vector2I PlantAtlasPos { get; set; }
 	public bool HasPlant { get; set; }
-	public ulong PlantStartTime { get; set; }
-	public List<BeehiveSaveData> Beehives { get; set; } = new List<BeehiveSaveData>();
+	public int PlantStage { get; set; }
+	public float PlantAge { get; set; }
 }

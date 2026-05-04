@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bon48p2kwrl2l"]
 
-[ext_resource type="Script" uid="uid://chxngudm214bn" path="res://scripts/MenuScenes/MainMenu.cs" id="1_0ykhv"]
+[ext_resource type="Script" uid="uid://chxngudm214bn" path="res://scripts/MenuScripts/MainMenu.cs" id="1_0ykhv"]
 [ext_resource type="Texture2D" uid="uid://7fjxt7u4vl2s" path="res://assets/other/armprod_valley_lobby_picture_v2.png" id="2_ow34m"]
 [ext_resource type="FontFile" uid="uid://cnp0fwojltvh0" path="res://assets/fonts/m5x7.ttf" id="3_2wh52"]
 [ext_resource type="PackedScene" uid="uid://768uhvuk1orr" path="res://scenes/MenuScenes/SettingsMenu.tscn" id="4_ow34m"]

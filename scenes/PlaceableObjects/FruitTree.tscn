@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://8qtgqv2scanl"]
 
-[ext_resource type="Script" uid="uid://b0uo36bkq4use" path="res://scripts/FruitTree.cs" id="1_pqxax"]
+[ext_resource type="Script" uid="uid://b0uo36bkq4use" path="res://scripts/PlaceableObjects/FruitTree.cs" id="1_pqxax"]
 [ext_resource type="Texture2D" uid="uid://oxakqge0reb0" path="res://assets/other/apple_tree.png" id="2_s357x"]
 [ext_resource type="Texture2D" uid="uid://22c5pa6sjl7c" path="res://assets/other/beehives.png" id="3_1b58p"]
 

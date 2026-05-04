@@ -8,13 +8,13 @@ public partial class FarmingSystem : TileMapLayer
 	[Export] public TileMapLayer GroundLayer;
 	[Export] public TileMapLayer PlantsLayer;
 	[Export] public Node2D Player; 
-	
+
 	[Export] private int _terrainSourceId = 0; // Atlas se zemí
 	[Export] private int _plantsSourceId = 1;  // Atlas s rostlinami
-
+	
 	[Export] public float MaxInteractionDistance = 60.0f; 
-
 	[Export] public float GrowthStageTimeSeconds = 60.0f;
+	
 	private int _maxStages = 6;
 	private Dictionary<Vector2I, ulong> _trackedPlants = new();
 
@@ -212,17 +212,76 @@ public partial class FarmingSystem : TileMapLayer
 	public List<TileSaveData> GetSaveData()
 	{
 		var list = new List<TileSaveData>();
-		
-		foreach (Vector2I pos in GroundLayer.GetUsedCells())
+		ulong currentTime = Time.GetTicksMsec();
+
+		// Procházíme všechna políčka, kde je zoráná hlína
+		foreach (Vector2I pos in GetUsedCells()) 
 		{
 			TileSaveData tile = new TileSaveData();
 			tile.Pos = pos;
-			tile.GroundAtlasPos = GroundLayer.GetCellAtlasCoords(pos);
-			tile.HasPlant = _trackedPlants.ContainsKey(pos);
-			tile.PlantStartTime = tile.HasPlant ? _trackedPlants[pos] : 0;
 			
+			// 1. Uložíme hlínu (Source ID 0)
+			// Předpokládám, že FarmingSystem je sám o sobě TileMapLayer pro hlínu
+			tile.GroundAtlasPos = GetCellAtlasCoords(pos);
+			
+			// 2. Podíváme se, jestli na tomto místě existuje i rostlina (Source ID 1)
+			bool hasPlantVisual = PlantsLayer.GetCellSourceId(pos) == _plantsSourceId;
+			tile.HasPlant = hasPlantVisual;
+
+			if (hasPlantVisual)
+			{
+				tile.PlantAtlasPos = PlantsLayer.GetCellAtlasCoords(pos);
+				
+				// Logika věku pro růst
+				if (_trackedPlants.ContainsKey(pos))
+				{
+					tile.PlantAge = (float)((currentTime - _trackedPlants[pos]) / 1000.0);
+				}
+				else
+				{
+					// Pokud vizuálně existuje, ale není v tracked, je vyrostlá
+					tile.PlantAge = _maxStages * GrowthStageTimeSeconds;
+				}
+			}
+
 			list.Add(tile);
 		}
 		return list;
 	}
+	
+	public void LoadTrackedPlant(Vector2I pos, float savedAge)
+	{
+		// Přepočítáme startTime tak, aby odpovídal aktuálnímu času aplikace
+		// startTime = teď - to, co už odrostlo
+		ulong newStartTime = Time.GetTicksMsec() - (ulong)(savedAge * 1000.0);
+		_trackedPlants[pos] = newStartTime;
+		
+		UpdateSinglePlantGrowth(pos);
+	}
+	
+	// Pomocná metoda pro aktualizaci jedné rostliny (aby se nečekalo na další _Process)
+	private void UpdateSinglePlantGrowth(Vector2I pos)
+	{
+		if (!_trackedPlants.ContainsKey(pos)) return;
+		
+		ulong currentTime = Time.GetTicksMsec();
+		double secondsPassed = (currentTime - _trackedPlants[pos]) / 1000.0;
+		int currentStage = (int)(secondsPassed / GrowthStageTimeSeconds);
+		
+		if (currentStage >= _maxStages - 1)
+			UpdatePlantTile(pos, _maxStages - 1);
+		else
+			UpdatePlantTile(pos, Math.Max(0, currentStage));
+	}
+	
+	public float GetPlantAge(Vector2I pos) 
+	{
+		if (_trackedPlants.ContainsKey(pos))
+		{
+			// Vrátí počet vteřin od zasazení do teď
+			return (float)((Time.GetTicksMsec() - _trackedPlants[pos]) / 1000.0);
+		}
+		return 0;
+	}
+	
 }

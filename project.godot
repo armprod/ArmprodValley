@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 SaveManager="*uid://bjj4k2clytdm8"
 PauseMenu="*uid://in85dd45cg1j"
+TimeManager="*uid://dxdsxurjh204y"
 
 [display]
 

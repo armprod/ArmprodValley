@@ -38,26 +38,28 @@ public partial class SaveManager : Node
 	{
 		GD.Print($"--- POKUS O ULOŽENÍ (Slot {id}) ---");
 
-		// KONTROLA 1: Máme propojený uzel?
 		if (FarmingLayerNode == null)
 		{
 			FarmingLayerNode = GetTree().Root.FindChild("FarmingLayer", true, false) as TileMapLayer;
 		}
 
-		if (FarmingLayerNode != null)
+		if (FarmingLayerNode is FarmingSystem farming)
 		{
+			// Metoda, která korektně ošetřuje i vyrostlé plodiny
+			data.FarmTiles = farming.GetSaveData();
+			GD.Print($"Uloženo {data.FarmTiles.Count} políček přes FarmingSystem.");
+		}
+		else if (FarmingLayerNode != null)
+		{
+			// Záložní logika, pokud by přetypování selhalo
 			data.FarmTiles.Clear();
-			var cells = FarmingLayerNode.GetUsedCells();
-			GD.Print($"Nalezeno políček k uložení: {cells.Count}");
-
-			foreach (Vector2I cell in cells)
+			foreach (Vector2I cell in FarmingLayerNode.GetUsedCells())
 			{
 				TileSaveData tData = new TileSaveData {
 					Pos = cell,
 					GroundAtlasPos = FarmingLayerNode.GetCellAtlasCoords(cell)
 				};
 
-				// KONTROLA 2: Máme rostliny?
 				if (PlantsLayerNode != null && PlantsLayerNode.GetCellSourceId(cell) != -1)
 				{
 					tData.HasPlant = true;
@@ -66,12 +68,8 @@ public partial class SaveManager : Node
 				data.FarmTiles.Add(tData);
 			}
 		}
-		else
-		{
-			GD.PrintErr("KRITICKÁ CHYBA: FarmingLayerNode nebyl nalezen ani po záchranném pokusu!");
-		}
 		
-		data.Beehives.Clear(); // Předpokládám, že máš tento List v SaveData
+		data.Beehives.Clear();
 		var beehiveNodes = GetTree().GetNodesInGroup("beehives");
 		GD.Print($"Nalezeno úlů k uložení: {beehiveNodes.Count}");
 
@@ -81,25 +79,31 @@ public partial class SaveManager : Node
 			{
 				data.Beehives.Add(new BeehiveSaveData {
 					Pos = beehive.GlobalPosition,
-					// Pokud máš _currentStage jako private, udělej si na ni public getter
-					CurrentStage = beehive.GetCurrentStage() 
+					CurrentStage = beehive.GetCurrentStage()
 				});
 			}
 		}
 		
-		data.FruitTrees.Clear(); // Přidejte tento List do třídy SaveData
+		data.FruitTrees.Clear();
 		var treeNodes = GetTree().GetNodesInGroup("trees");
 		GD.Print($"Nalezeno stromů k uložení: {treeNodes.Count}");
 
 		foreach (Node node in treeNodes)
 		{
-			if (node is FruitTree tree) // Předpokládám název třídy FruitTree
+			if (node is FruitTree tree)
 			{
 				data.FruitTrees.Add(new FruitTreesSaveData {
 					Pos = tree.GlobalPosition,
 					CurrentStage = tree.GetCurrentStage()
 				});
 			}
+		}
+		
+		if (TimeManager.Instance != null)
+		{
+			data.CurrentDay = TimeManager.Instance.CurrentDay;
+			data.TotalSeconds = TimeManager.Instance.TotalSeconds;
+			GD.Print($"Ukládám čas do JSONu: Den {data.CurrentDay}, Sekundy {data.TotalSeconds}");
 		}
 
 		// Uložení do JSONu (nezapomeň na ty Options, jinak Vector2I nebude fungovat!)
@@ -129,12 +133,17 @@ public partial class SaveManager : Node
 
 		foreach (var tile in data.FarmTiles)
 		{
-			// Změň tu 1 na 0, pokud se stále nic neobjevuje!
 			FarmingLayerNode.SetCell(tile.Pos, 0, tile.GroundAtlasPos);
 			
 			if (tile.HasPlant)
 			{
-				PlantsLayerNode?.SetCell(tile.Pos, 0, tile.PlantAtlasPos);
+				PlantsLayerNode?.SetCell(tile.Pos, 1, tile.PlantAtlasPos);
+				
+				if (FarmingLayerNode is FarmingSystem farming)
+				{
+					// OPRAVA: Předáváme PlantAge, nikoliv StartTime
+					farming.LoadTrackedPlant(tile.Pos, tile.PlantAge);
+				}
 			}
 		}
 		
@@ -143,20 +152,23 @@ public partial class SaveManager : Node
 		foreach (var bData in data.Beehives)
 		{
 			var newBeehive = beehiveScene.Instantiate<Beehive>();
-			GetTree().CurrentScene.AddChild(newBeehive); 
+			FarmingLayerNode.GetParent().AddChild(newBeehive);
 			newBeehive.GlobalPosition = bData.Pos;
 			newBeehive.LoadFromSave(bData.CurrentStage); 
 		}
 		
+		foreach (Node node in GetTree().GetNodesInGroup("trees")) node.QueueFree();
 		PackedScene treeScene = GD.Load<PackedScene>("res://scenes/PlaceableObjects/FruitTree.tscn");
 		foreach (var tData in data.FruitTrees)
 		{
 			var newTree = treeScene.Instantiate<FruitTree>();
-			GetTree().CurrentScene.AddChild(newTree); 
+			FarmingLayerNode.GetParent().AddChild(newTree);
 			newTree.GlobalPosition = tData.Pos;
 			newTree.LoadFromSave(tData.CurrentStage); 
 		}
-
+		
+		if (TimeManager.Instance != null)
+			TimeManager.Instance.LoadTime(data.CurrentDay, data.TotalSeconds);
 
 		GD.Print($"ÚSPĚCH: Načteno {data.FarmTiles.Count} políček, {data.Beehives.Count} úlů a {data.FruitTrees.Count} stromů.");
 		return data;

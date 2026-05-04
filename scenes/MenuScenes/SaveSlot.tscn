@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dkhbggcvyoldy"]
 
-[ext_resource type="Script" uid="uid://bh0n5811ofkui" path="res://scripts/MenuScenes/SaveSlot.cs" id="1_41ent"]
+[ext_resource type="Script" uid="uid://bh0n5811ofkui" path="res://scripts/MenuScripts/SaveSlot.cs" id="1_41ent"]
 
 [node name="SaveSlot" type="Button" unique_id=1571092284 node_paths=PackedStringArray("TitleLabel", "DeleteButton", "RenameInput", "RenameButton")]
 custom_minimum_size = Vector2(400, 80)
