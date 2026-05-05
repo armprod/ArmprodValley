@@ -16,7 +16,6 @@ public partial class WorldLight : CanvasModulate
 		// Získáme aktuální čas jako jedno desetinné číslo (např. 14.5 pro 14:30)
 		float time = TimeManager.Instance.GetFloatTime();
 		
-		// Nastavíme barvu podle hodiny
 		UpdateColor(time);
 	}
 

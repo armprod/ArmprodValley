@@ -17,8 +17,7 @@ public partial class TimeManager : Node
 	public override void _Ready()
 	{
 		Instance = this;
-		// Začneme třeba v 8 ráno
-		_totalSeconds = 8 * 3600; 
+		_totalSeconds = 8 * 3600; // 8:00
 	}
 
 	public override void _Process(double delta)
@@ -30,7 +29,6 @@ public partial class TimeManager : Node
 		int newHours = (newTotalMinutes / 60) % 24;
 		int newDays = (newTotalMinutes / (60 * 24)) + 1;
 
-		// Vyšleme signál jen když se změní minuta
 		if (newMinutes != _minutes)
 		{
 			_minutes = newMinutes;
@@ -44,7 +42,6 @@ public partial class TimeManager : Node
 	
 	public float GetFloatTime()
 	{
-		// Vrátí čas jako číslo, např. 8.5 pro 8:30 ráno
 		return _hours + (_minutes / 60.0f);
 	}
 	
@@ -53,11 +50,9 @@ public partial class TimeManager : Node
 		_days = day;
 		_totalSeconds = totalSeconds;
 		
-		// Okamžitě přepočítáme minuty/hodiny, aby UI nečekalo na další Tick
 		_minutes = (int)(_totalSeconds / 60) % 60;
 		_hours = (int)(_totalSeconds / 3600) % 24;
 		
-		// Vyšleme signál, aby se zaktualizoval Label a Světlo
 		EmitSignal(SignalName.TimeChanged, _days, _hours, _minutes);
 	}
 	
