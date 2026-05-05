@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://0wso0ghk3flj"]
 
 [ext_resource type="Script" uid="uid://3nnhgxk65r26" path="res://scripts/Main.cs" id="1_vcsgt"]
-[ext_resource type="PackedScene" uid="uid://bea2caoccgeip" path="res://scenes/Player.tscn" id="2_c01mt"]
+[ext_resource type="PackedScene" uid="uid://bea2caoccgeip" path="res://scenes/player.tscn" id="2_c01mt"]
 [ext_resource type="Texture2D" uid="uid://85tivy51pvbe" path="res://assets/terrain/terrain_pallet.png" id="3_nxtc6"]
 [ext_resource type="Texture2D" uid="uid://5no27iimv70j" path="res://assets/terrain/trees.png" id="4_vcsgt"]
 [ext_resource type="Texture2D" uid="uid://bxmqi4fpiqyfo" path="res://assets/terrain/terrain_blocks_pallet.png" id="5_c01mt"]
@@ -419,10 +419,11 @@ PlantsLayer = NodePath("../PlantsLayer")
 Player = NodePath("../Player")
 MaxInteractionDistance = 90.0
 
-[node name="Player" parent="." unique_id=1670660227 node_paths=PackedStringArray("WaterLayer") instance=ExtResource("2_c01mt")]
+[node name="Player" parent="." unique_id=1670660227 node_paths=PackedStringArray("WaterLayer", "_farmingSystem") instance=ExtResource("2_c01mt")]
 z_index = 9
 position = Vector2(0, -500)
 WaterLayer = NodePath("../Water")
+_farmingSystem = NodePath("../FarmingLayer")
 
 [node name="PlantsLayer" type="TileMapLayer" parent="." unique_id=1741374887]
 z_index = 3

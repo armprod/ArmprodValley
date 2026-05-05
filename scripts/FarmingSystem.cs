@@ -234,16 +234,11 @@ public partial class FarmingSystem : TileMapLayer
 				
 				// Logika věku pro růst
 				if (_trackedPlants.ContainsKey(pos))
-				{
 					tile.PlantAge = (float)((currentTime - _trackedPlants[pos]) / 1000.0);
-				}
 				else
-				{
-					// Pokud vizuálně existuje, ale není v tracked, je vyrostlá
 					tile.PlantAge = _maxStages * GrowthStageTimeSeconds;
-				}
 			}
-
+			
 			list.Add(tile);
 		}
 		return list;
@@ -251,15 +246,11 @@ public partial class FarmingSystem : TileMapLayer
 	
 	public void LoadTrackedPlant(Vector2I pos, float savedAge)
 	{
-		// Přepočítáme startTime tak, aby odpovídal aktuálnímu času aplikace
-		// startTime = teď - to, co už odrostlo
 		ulong newStartTime = Time.GetTicksMsec() - (ulong)(savedAge * 1000.0);
 		_trackedPlants[pos] = newStartTime;
-		
 		UpdateSinglePlantGrowth(pos);
 	}
 	
-	// Pomocná metoda pro aktualizaci jedné rostliny (aby se nečekalo na další _Process)
 	private void UpdateSinglePlantGrowth(Vector2I pos)
 	{
 		if (!_trackedPlants.ContainsKey(pos)) return;
@@ -277,11 +268,20 @@ public partial class FarmingSystem : TileMapLayer
 	public float GetPlantAge(Vector2I pos) 
 	{
 		if (_trackedPlants.ContainsKey(pos))
-		{
-			// Vrátí počet vteřin od zasazení do teď
 			return (float)((Time.GetTicksMsec() - _trackedPlants[pos]) / 1000.0);
-		}
 		return 0;
+	}
+	
+	public void ExecuteAction(Vector2 mousePos, string toolSuffix)
+	{
+		switch (toolSuffix)
+		{
+			case "_hoe": HandleTilling(mousePos); break;
+			case "_can": WaterGround(mousePos); break;
+			case "_seed": HandlePlanting(mousePos); break;
+			case "_scythe": HandleHarvesting(mousePos); break;
+			case "_pickaxe": HandleMineGround(mousePos); break;
+		}
 	}
 	
 }

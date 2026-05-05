@@ -12,22 +12,24 @@ public partial class Player : CharacterBody2D
 	[Export] public float Speed = 100.0f;
 	[Export] public float MaxInteractionDistance = 60.0f;
 	[Export] public TileMapLayer WaterLayer;
+	[Export] private FarmingSystem _farmingSystem;
 	[Export] private int _beehivePrice = 10000;
 	[Export] private int _fruitTreePrice = 5000;
-	
 	[Export]private Label _moneyLabel;
 	[Export]private Label _timeLabel;
 	[Export]private Label _dayLabel;
+	[Export] public float ActionCooldown = 0.2f;
 	
 	// GENERAL
+	private FishingSystem _fishing;
 	private AnimationPlayer _animPlayer;
 	private int _money = 0;
 	public string _currentToolSuffix = ""; 
 	private bool _isActing = false;
 	private Vector2 _lookDirection = Vector2.Down;
 	private string _lastDirStr = "down";
-	
-	private FishingSystem _fishing;
+	private float _actionTimer = 0.0f;
+	private string _selectedSlot => _currentToolSuffix;
 
 	// BUILDING SYSTEM
 	private Node2D _ghostBuilding;      
@@ -50,9 +52,7 @@ public partial class Player : CharacterBody2D
 		
 		_buildMenu = GetTree().CurrentScene.FindChild("BuildMenu", true, false) as BuildMenu;
 		if (_buildMenu != null)
-		{
 			_buildMenu.BuildingSelected += (scenePath, price) => StartGhostPlacement(scenePath, price);
-		}
 
 		if (_animPlayer != null)
 			_animPlayer.AnimationFinished += OnAnimationFinished;
@@ -76,43 +76,18 @@ public partial class Player : CharacterBody2D
 
 		if (timeManager != null)
 		{
-			// Propojíme signál s metodou UpdateTimelineUI
 			timeManager.Connect(TimeManager.SignalName.TimeChanged, Callable.From<int, int, int>(UpdateTimelineUI));
-			
-			// Hned po startu tam něco vypíšeme, abychom viděli, že to funguje
 			UpdateTimelineUI(timeManager.CurrentDay, 8, 0);
 			GD.Print("PLAYER: Úspěšně připojeno k TimeManageru.");
-		}
-		else
-		{
-			GD.PrintErr("PLAYER: TimeManager nebyl ve scéně nalezen!");
 		}
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (_actionTimer > 0) _actionTimer -= (float)delta;
 		if (_isPlacing && _ghostBuilding != null)
 		{
-			Vector2 mousePos = GetGlobalMousePosition();
-			int gridSize = 16;
-			
-			// Výpočet mřížky
-			float snappedX = Mathf.Floor(mousePos.X / gridSize) * gridSize;
-			float snappedY = Mathf.Floor(mousePos.Y / gridSize) * gridSize;
-			_ghostBuilding.GlobalPosition = new Vector2(snappedX, snappedY);
-
-			int currentPrice = GetCurrentBuildingPrice();
-			_ghostBuilding.Modulate = (Money >= currentPrice) ? new Color(1, 1, 1, 0.5f) : new Color(1, 0, 0, 0.5f);
-
-			if (!_canPlaceNow && !Input.IsActionPressed("action_use"))
-				_canPlaceNow = true;
-			if (_canPlaceNow && Input.IsActionJustPressed("action_use"))
-				PlaceRealBuilding();
-			else if (Input.IsActionJustPressed("ui_cancel"))
-				CancelPlacement();
-			
-			Velocity = Vector2.Zero;
-			MoveAndSlide();
+			HandleBuildingLogic(); // Doporučuji časem kód pro stavění přesunout do vlastní metody, ať je to tu čisté
 			return;
 		}
 
@@ -124,8 +99,10 @@ public partial class Player : CharacterBody2D
 			return;
 		}
 
+		if (Input.IsActionPressed("action_use") && _actionTimer <= 0 && !_isPlacing)
+			PerformContinuousFarming();
+
 		Vector2 direction = Input.GetVector("left", "right", "up", "down");
-		
 		if (direction != Vector2.Zero)
 		{
 			_lookDirection = direction;
@@ -138,7 +115,6 @@ public partial class Player : CharacterBody2D
 			Velocity = Velocity.MoveToward(Vector2.Zero, Speed);
 			if (!_isActing) PlayIdleAnimation();
 		}
-
 		MoveAndSlide();
 	}
 
@@ -152,13 +128,10 @@ public partial class Player : CharacterBody2D
 		}
 
 		if (_isActing || _isPlacing) return;
-
 		HandleSlotInput(@event);
 
 		if (@event.IsActionPressed("action_interact"))
-		{
 			HandleInteraction(false); 
-		}
 
 		if (@event.IsActionPressed("action_use"))
 		{    
@@ -181,11 +154,8 @@ public partial class Player : CharacterBody2D
 			if (!string.IsNullOrEmpty(_currentToolSuffix))
 			{
 				PlayToolAnimation();
-				
 				if (_currentToolSuffix == "_pickaxe" || _currentToolSuffix == "_axe")
-				{
 					HandleInteraction(true); 
-				}
 			}
 		}
 	}
@@ -226,8 +196,7 @@ public partial class Player : CharacterBody2D
 	public bool IsFacingWater()
 	{
 		if (WaterLayer == null) return false;
-		// Kontrola 24 pixelů před hráčem
-		Vector2 checkPos = GlobalPosition + (_lookDirection * 24);
+		Vector2 checkPos = GlobalPosition + (_lookDirection * 32);
 		Vector2I tilePos = WaterLayer.LocalToMap(WaterLayer.ToLocal(checkPos));
 		return WaterLayer.GetCellTileData(tilePos) != null;
 	}
@@ -349,6 +318,11 @@ public partial class Player : CharacterBody2D
 		string aName = animName.ToString();
 		if (aName.StartsWith("cast_")) _fishing?.OnCastAnimationFinished();
 		else if (aName.StartsWith("use_") || aName.StartsWith("bite_") || aName.StartsWith("catch_")) _isActing = false;
+		
+		if (animName.ToString().StartsWith("use_")) 
+		{
+			_isActing = false; // Tímto dovolíš další švih při držení tlačítka
+		}
 	}
 
 	private string GetDirectionName(Vector2 dir) 
@@ -388,5 +362,54 @@ public partial class Player : CharacterBody2D
 		if (TimeManager.Instance != null)
 			TimeManager.Instance.TimeChanged -= OnTimeChanged;
 	}
+	
+	// Pomocná metoda pro plynulé farmaření
+	private void PerformContinuousFarming()
+	{
+		if (_isActing) return; // Pokud postava zrovna seká, nepouštěj to znovu
+		Vector2 mousePos = GetGlobalMousePosition();
+		
+		// Kontrola vzdálenosti (MaxInteractionDistance)
+		if (GlobalPosition.DistanceTo(mousePos) > MaxInteractionDistance + 20.0f) return;
+		
+		if (_farmingSystem != null && !string.IsNullOrEmpty(_currentToolSuffix))
+		{
+			_farmingSystem.ExecuteAction(mousePos, _currentToolSuffix);
+			_actionTimer = ActionCooldown; 	
+			PlayToolAnimation();
+		}
+	}
+	
+	private void HandleBuildingLogic()
+	{
+		
+		Vector2 mousePos = GetGlobalMousePosition();
+		int gridSize = 16;
+		
+		// Výpočet mřížky (snapping)
+		float snappedX = Mathf.Floor(mousePos.X / gridSize) * gridSize;
+		float snappedY = Mathf.Floor(mousePos.Y / gridSize) * gridSize;
+		_ghostBuilding.GlobalPosition = new Vector2(snappedX, snappedY);
+
+		int currentPrice = GetCurrentBuildingPrice();
+		
+		_ghostBuilding.Modulate = (Money >= currentPrice) ? new Color(1, 1, 1, 0.5f) : new Color(1, 0, 0, 0.5f);
+
+		// Ochrana proti okamžitému položení při kliknutí v menu
+		if (!_canPlaceNow && !Input.IsActionPressed("action_use"))
+			_canPlaceNow = true;
+
+		// Položení budovy
+		if (_canPlaceNow && Input.IsActionJustPressed("action_use"))
+			PlaceRealBuilding();
+			
+		// Zrušení režimu stavění
+		else if (Input.IsActionJustPressed("ui_cancel"))
+			CancelPlacement();
+		
+		// Při stavění se hráč nehýbe
+		Velocity = Vector2.Zero;
+		MoveAndSlide();
+	}	
 	
 }
