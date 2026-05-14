@@ -7661,6 +7661,7 @@ libraries/ = SubResource("AnimationLibrary_sweqy")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=2084284203]
 zoom = Vector2(2.5, 2.5)
+process_callback = 0
 
 [node name="Idventory" type="Sprite2D" parent="." unique_id=1595265543]
 z_index = 9
