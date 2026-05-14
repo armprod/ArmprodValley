@@ -7663,7 +7663,7 @@ libraries/ = SubResource("AnimationLibrary_sweqy")
 zoom = Vector2(2.5, 2.5)
 
 [node name="Idventory" type="Sprite2D" parent="." unique_id=1595265543]
-z_index = 2
+z_index = 9
 position = Vector2(-200, -180)
 scale = Vector2(2, 2)
 texture = ExtResource("11_p07f3")
@@ -7675,7 +7675,7 @@ layout_mode = 3
 anchors_preset = 0
 
 [node name="MoneyLayout" type="Sprite2D" parent="Layouts" unique_id=1483037059]
-z_index = 2
+z_index = 9
 position = Vector2(300, -180)
 scale = Vector2(2, 2)
 texture = SubResource("AtlasTexture_0rnld")
@@ -7698,7 +7698,7 @@ vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="TimeLayout" type="Sprite2D" parent="Layouts" unique_id=1891444904]
-z_index = 2
+z_index = 9
 position = Vector2(300, -140)
 scale = Vector2(2, 2)
 texture = SubResource("AtlasTexture_srp4u")
@@ -7716,7 +7716,7 @@ vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="DayLayout" type="Sprite2D" parent="Layouts" unique_id=178870733]
-z_index = 2
+z_index = 9
 position = Vector2(300, -100)
 scale = Vector2(2, 2)
 texture = SubResource("AtlasTexture_jfpux")
@@ -7734,6 +7734,7 @@ vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="FishingComponents" type="Node2D" parent="." unique_id=267292855]
+z_index = 9
 script = ExtResource("13_fgkxt")
 FishingBarScene = ExtResource("14_xsi7p")
 
