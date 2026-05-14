@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ch2c5dx8cnimr"
-path="res://.godot/imported/building_block_pallet_woods.png-b68075c0b543701c043406324a028dec.ctex"
+uid="uid://bgqmgdv5688jn"
+path="res://.godot/imported/building_block_pallet_bricks.png-2f0bc3b9529973d599a1237181a690b7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/terrain/building_block_pallet_woods.png"
-dest_files=["res://.godot/imported/building_block_pallet_woods.png-b68075c0b543701c043406324a028dec.ctex"]
+source_file="res://assets/building/building_block_pallet_bricks.png"
+dest_files=["res://.godot/imported/building_block_pallet_bricks.png-2f0bc3b9529973d599a1237181a690b7.ctex"]
 
 [params]
 
